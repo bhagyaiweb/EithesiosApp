@@ -231,12 +231,16 @@ extension CommunityRepresentativeElectedOffical{
             let activityData = ActivityData()
             NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
             
+        print(Defines.ServerUrl+urlEndPath)
+        print(parameter)
+        
             DataProvider.sharedInstance.getDataFromRegister(path: Defines.ServerUrl + urlEndPath, dataDict: parameter, { (json) in
     //                            print(json)
                                 NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                                 if json["status"].stringValue == "200" {
                                     
                                     if let data = json["data"].array{
+                                        print(data)
                                         self.collection = data
                                         self.CommunityRepresentElectedOfficalTable.isHidden = false
                                         self.CommunityRepresentElectedOfficalTable.reloadData()

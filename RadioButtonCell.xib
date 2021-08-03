@@ -17,10 +17,10 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PSI-h5-R1L">
-                        <rect key="frame" x="16" y="3.5" width="20" height="20"/>
+                        <rect key="frame" x="21" y="6" width="15" height="15"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="20" id="7sY-5t-zVY"/>
-                            <constraint firstAttribute="width" constant="20" id="lJS-sP-en3"/>
+                            <constraint firstAttribute="height" constant="15" id="7sY-5t-zVY"/>
+                            <constraint firstAttribute="width" constant="15" id="lJS-sP-en3"/>
                         </constraints>
                         <state key="normal" image="radioUncheck"/>
                         <connections>
@@ -37,7 +37,7 @@
                 <constraints>
                     <constraint firstItem="KW9-2M-kRu" firstAttribute="leading" secondItem="PSI-h5-R1L" secondAttribute="trailing" constant="16" id="Dz7-eE-60q"/>
                     <constraint firstItem="PSI-h5-R1L" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="IRI-LI-yiY"/>
-                    <constraint firstItem="PSI-h5-R1L" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="bWJ-Tn-j58"/>
+                    <constraint firstItem="PSI-h5-R1L" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="21" id="bWJ-Tn-j58"/>
                     <constraint firstItem="KW9-2M-kRu" firstAttribute="centerY" secondItem="PSI-h5-R1L" secondAttribute="centerY" id="hXz-EU-dcv"/>
                 </constraints>
             </tableViewCellContentView>

@@ -278,6 +278,18 @@ class DashboarethisVC: UIViewController,UITableViewDataSource,UITableViewDelegat
         }
      }
 
+    
+    @IBAction func sosButton(_ sender: Any) {
+        
+        
+        let vc = self.storyboard?.instantiateViewController(identifier: "ChooseCategoryVC")
+        vc?.modalPresentationStyle = .fullScreen
+        self.present(vc!, animated: true, completion: nil)
+        
+    }
+    
+    
+    
 }
 
 

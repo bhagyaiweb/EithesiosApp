@@ -20,7 +20,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
         
     var nameArrayCell = ["Ali Morshedlou","Bram Naus","Ellyot"]
     var buttonNAmeArray = ["Self Help Videos","Attorneys","Bail Bonds","Vehicle Registration","Vehicle Insurance","Driver License"]
-    var DirectoryButtonArray = ["My Connections","Trackers"]
+    var DirectoryButtonArray = ["My Connections","Tracker"]
     var vehicleREgistrationArray = ["Vehicle Name","Model Number","Vehicle Number","Model Year","Registration Number","VIN Number","License Plate Number"]
     var vehicleInsuranceArray = ["Insurance Name","Start Date","Expire Date","Policy Number","Liability Coverage","Comp and Collission"]
     var connectionListArray = ["","Name","Mobile Number","Email","Location",""]
@@ -1284,7 +1284,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                     self.addMoreButton.isHidden = false
                     self.addMoreButton.setTitle("Add New", for: .normal)
                 }
-                    else if cell.shopLiftingBtn.titleLabel?.text == "Trackers"{
+                    else if cell.shopLiftingBtn.titleLabel?.text == "Tracker"{
                         self.getTrackerLists()
                     self.trackerButtonView.isHidden = false
                     self.trackerList.removeAll()
@@ -1455,7 +1455,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                       return myConnections.count
                   }
               }
-              else if buttonName == "Trackers"
+              else if buttonName == "Tracker"
               {
                   return trackerList.count
               }
@@ -1644,7 +1644,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                        return cell
                     }
             }
-           else if buttonName == "Trackers"{
+           else if buttonName == "Tracker"{
             
             let cell = tableView.dequeueReusableCell(withIdentifier: "TrackersCell", for: indexPath) as! TrackersCell
                 
@@ -1721,7 +1721,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
         {
             return 80
         }
-        if buttonName == "Trackers"
+        if buttonName == "Tracker"
         {
             return 80
         }
@@ -2076,7 +2076,9 @@ extension UserBenifitVC: UITextFieldDelegate{
         }
         else if textField.placeholder! == "Model Year"{
             if textField.text?.count != 0{
-                if Int(textField.text!)! > 1900 && Int(textField.text!)! <= 2020{
+                let year = Calendar.current.component(.year, from: Date())
+                
+                if Int(textField.text!)! > 1900 && Int(textField.text!)! <= year{
                     self.formValues["Model Year"] = textField.text!
                 }
                 else{
