@@ -14,6 +14,7 @@ protocol MyCellDelegate: AnyObject
 
 class Feedscell: UITableViewCell {
  
+    @IBOutlet weak var newlbl: UILabel!
     
     
     @IBOutlet weak var backgroundImg: UIImageView!
@@ -35,6 +36,7 @@ class Feedscell: UITableViewCell {
 //        Feedcollection.dataSource = self
         reginib()
     }
+   
 // on preseed arrow btn
     @IBAction func onPressedArrowbtn( sender: AnyObject)
     {
@@ -42,10 +44,8 @@ class Feedscell: UITableViewCell {
         
     }
     
-
     // working with collectionview  call
     func reginib()
-        
     {
         let nib = UINib(nibName: "FeedsCollectionVC", bundle: nil)
         Feedcollection.register(nib, forCellWithReuseIdentifier: "FeedsCollectionVC")

@@ -10,6 +10,13 @@ import UIKit
 
 class ParallelStreamCell: UICollectionViewCell {
 
+    @IBOutlet weak var imagedisplayView: UIImageView!
+    
+    @IBOutlet weak var nameLbl: UILabel!
+    
+    
+    
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code

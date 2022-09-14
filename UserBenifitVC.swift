@@ -3,6 +3,9 @@
 //  Eithes
 //  Created by Shubham Tomar on 27/03/20.
 //  Copyright © 2020 Iws. All rights reserved.
+
+
+
 import UIKit
 import SwiftyJSON
 import Alamofire
@@ -13,18 +16,93 @@ import MessageUI
 import AVKit
 import Kingfisher
 import FittedSheets
+import AVFoundation
+import SDWebImage
 
 
-class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,UITableViewDelegate,UITableViewDataSource,MyCellDelegate1,CommuntyReprsentativeTablecellDelegate, MFMessageComposeViewControllerDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,RegisteredVehicleCellDelegate,drivingLicenceCellDelegate,profileImgCellDelegate,RadioButtonCellDelegate{
+protocol passdataOnBackBtnDelegate{
+    func userSelectedValue12(info : String)
+}
+
+
+class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,UITableViewDelegate,UITableViewDataSource,MyCellDelegate1,CommuntyReprsentativeTablecellDelegate, MFMessageComposeViewControllerDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate,RegisteredVehicleCellDelegate,drivingLicenceCellDelegate,profileImgCellDelegate,RadioButtonCellDelegate,UIPickerViewDelegate,UIPickerViewDataSource,zipcodeSelectedDelegate,checking1delegate, UIGestureRecognizerDelegate{
         
+    func navigateToDashboard(isclicked: String) {
+        //self.ZipCodeLbl.isHidden = false
+        print("ISCLIKED1",isclicked)
+        self.userzipcodeLbl.text = isclicked
+        print("ISCLIKED12",self.userzipcodeLbl.text!)
+        self.userZipcodeStr = isclicked
+    }
+      
+    func userSelectedValueMyAccount(info: String) {
+        self.userzipcodeLbl.text = info
+        print("PINCODEsdsds",info)
+    }
         
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return zipCodesArr.count
+    }
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+
+        self.view.endEditing(true)
+        return zipCodesArr[row]
+
+    }
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+
+        self.userzipcodeLbl.text = self.zipCodesArr[row]
+        self.zipdropdown.isHidden = true
+        self.nameTitle = "Attorneys"
+        getAttorneyList()
+        atteorneysTable.reloadData()
+        self.nameTitle = "Bail Bonds"
+        getBailBondList()
+        atteorneysTable.reloadData()
+    }
+    
+    
+    
+    @IBOutlet weak var fullviewImageshow: UIImageView!
+        
+    @IBOutlet weak var deleteImg: UIImageView!
+    
+    @IBOutlet weak var plusimage: UIImageView!
+    
+    var userZipcodeStr : String?
+    var imgStringUrl : String?
+        
+    @IBOutlet weak var zipBtnoutlet: UIButton!
+    
+    @IBOutlet weak var zipdropdown: UIPickerView!
+    
+    @IBOutlet weak var zicodeUIView: UIView!
+    
+    @IBOutlet weak var lineView: UIView!
+
+    @IBOutlet weak var newLbl: UILabel!
+    
+    var urlString : String?
+    var delegatez : passdataOnBackBtnDelegate? = nil
+    var getvideoid : Int?
+    var imagestr : String?
+    var newURL : URL!
+    var imgUrl : URL!
+    
+    var zipCodesArr = ["27212","201302","90001","376688","110096","201301"]
+
     var nameArrayCell = ["Ali Morshedlou","Bram Naus","Ellyot"]
     var buttonNAmeArray = ["Self Help Videos","Attorneys","Bail Bonds","Vehicle Registration","Vehicle Insurance","Driver License"]
     var DirectoryButtonArray = ["My Connections","Tracker"]
     var vehicleREgistrationArray = ["Vehicle Name","Model Number","Vehicle Number","Model Year","Registration Number","VIN Number","License Plate Number"]
-    var vehicleInsuranceArray = ["Insurance Name","Start Date","Expire Date","Policy Number","Liability Coverage","Comp and Collission"]
+    var vehicleInsuranceArray = ["Insurance Name","Start Date","Expire Date","Policy Number","Liability Coverage","Comp and Collission Coverage"]
     var connectionListArray = ["","Name","Mobile Number","Email","Location",""]
-    var formValues = ["Vehicle Name":"","Model Number":"","Vehicle Number":"","Model Year":"","Registration Number":"","VIN Number":"","License Plate Number":"","Insurance Name":"","Start Date":"","Expire Date":"","Policy Number":"","Liability Coverage ":"","Comp and Collission Coverage":"","Name":"","Mobile Number":"","Email":"","Location":""]
+    var formValues = ["Vehicle Name":"","Model Number":"","Vehicle Number":"","Model Year":"","Registration Number":"","VIN Number":"","License Plate Number":"","Insurance Name":"","Start Date":"","Expire Date":"","Policy Number":"","Liability Coverage":"","Comp and Collission Coverage":"","Name":"","Mobile Number":"","Email":"","Location":""]
     var formValues1 = ["Vehicle Name":"","Model Number":"","Vehicle Number":"","Model Year":"","Registration Number":"","VIN Number":"","License Plate Number":"","Insurance Name":"","Start Date":"","Expire Date":"","Policy Number":"","Liability Coverage ":"","Comp and Collission Coverage":"","Name":"","Mobile Number":"","Email":"","Location":""]
     
     var registeredVehicles = Array<JSON>()
@@ -35,17 +113,28 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
     var trackerList = Array<JSON>()
     var drivingLicenseImage = Array<JSON>()
     var myConnections = Array<JSON>()
-    var buttonName = ""
+    var editlistArray = Array<JSON>()
+    var imgListArr = Array<JSON>()
+    var buttonName = "Self Help Videos"
     var nameTitle = ""
     var indexpath:IndexPath?
     var startDateIndexpath:IndexPath?
     var expireDateIndexpath:IndexPath?
-    let datePicker = UIDatePicker()
+    var datePicker = UIDatePicker()
     var startDate = true
-    var VideoUrl: URL?
+    var VideoUrl: URL!
     var drivingLicenseImg: UIImage?
+    var uploadImg: UIImage?
     var radioButtonPermission: Bool?
-    var userDirectory:Bool? 
+    var userDirectory:Bool?
+    var base64Str: String = ""
+    var videoIDStr : String = ""
+    var newImg: UIImage?
+
+    
+    @IBOutlet weak var sosbutnoutlet: UIButton!
+    
+    @IBOutlet weak var userzipcodeLbl: UILabel!
     
     @IBOutlet weak var videouploadBtn: UIButton!
     @IBOutlet weak var SosBtn: UIButton!
@@ -62,19 +151,23 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
     @IBOutlet weak var buttonCollection: UICollectionView!
     @IBOutlet weak var atteorneysTable: UITableView!
     @IBOutlet weak var addMoreButton: UIButton!
-    @IBOutlet weak var ZipCodeLbl: UILabel!
     @IBOutlet weak var openVideoGalleryBttn: UIButton!
     @IBOutlet weak var videosCOllection: UICollectionView!
     @IBOutlet weak var addVideosButton: UIButton!
     @IBOutlet weak var uploadVideoLbl: UILabel!
     @IBOutlet weak var uploadVideoBGImageView: UIImageView!
     @IBOutlet weak var uploadVideoIcon: UIImageView!
-    
     @IBOutlet weak var videoTitleTF: UITextField!
     //    @IBOutlet weak var VRView: UIView!
     @IBOutlet weak var videoUploadCollectionView: UIView!
+    var selecteditem = 0
+    var activityIndicator = UIActivityIndicatorView()
+
+    
     override func viewDidLoad()
     {
+        self.datePicker = UIDatePicker(frame:CGRect(x: 50, y: 50, width: self.view.frame.size.width, height: 216))
+        getVideosList()
         self.Savebtn.isHidden = true
         self.trackerButtonView.isHidden = true
         super.viewDidLoad()
@@ -103,11 +196,41 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
         uploadDrivingLicenseBtn.layer.cornerRadius = 5
         uploadDrivingLicenseBtn.clipsToBounds = true
         self.atteorneysTable.tableFooterView = UIView()
+      // zicodeUIView.isHidden =  true
+//        self.activityIndicator = UIActivityIndicatorView(style: .gray)
+//           self.activityIndicator.frame = CGRect(x: 0, y: 0, width: 46, height: 46)
+//           self.activityIndicator.hidesWhenStopped = true
+//           view.addSubview(self.activityIndicator)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.ZipCodeLbl.text = UserData.ZipCode
+        self.newLbl.isHidden = true
+        
+        lineView.isHidden = false
+        print("USERNEWZIP1",self.userzipcodeLbl.text)
+        if self.buttonName == "Self Help Videos" {
+            self.zicodeUIView.isHidden = true
+        }else{
+            self.zicodeUIView.isHidden = false
+        }
+        
+        
+        
+        if self.buttonName == "Attorneys" {
+            self.getAttorneyList()
+        }else if self.buttonName == "Bail Bonds" {
+            self.getBailBondList()
+        }
+        
+      //  getVideosList()
+       // self.videosCOllection.reloadData()
+        self.zipBtnoutlet.setTitle("", for: .normal)
+        self.zipdropdown.isHidden = true
+        self.zipdropdown.backgroundColor = .white
+        //self.dropdownpick?.layer.borderWidth = 1.0
+        self.zipdropdown?.layer.cornerRadius = 3.0
+        self.zipdropdown?.layer.masksToBounds = true
         self.registeredVehicles.removeAll()
         self.insuredVehicles.removeAll()
         self.atorneyList.removeAll()
@@ -115,12 +238,81 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
         self.indexpath = nil
         self.buttonCollection.reloadData()
         self.atteorneysTable.reloadData()
-        self.atteorneysTable.isHidden = true
+        self.atteorneysTable.isHidden = false
+        self.sosbutnoutlet.isHidden = true
+        print("USERNEWZIP",self.userzipcodeLbl.text!)
+        print("VALUE",userZipcodeStr)
+        self.userzipcodeLbl.text! = self.userZipcodeStr ?? "90001"
+        
+//        if newURL == nil {
+//            print("NILSHOW")
+//        }else{
+//            getThumbnailImageFromVideoUrl(url: newURL) { (thumbImage) in
+//                print("thumbnail",thumbImage)
+//              //  cell.videoThumbnail.sd_setImage(with: thumbImage)
+//
+//                    // cell.videoThumbnail.image = thumbImage
+//                self.newImg = thumbImage
+//                print("AssignImg",self.newImg)
+//
+//              //  cell.editImg.isHidden = false
+//
+//    //            if (thumbImage == nil){
+//    //                print("jjjjjjjjGGGGG")
+//    //            }else{
+//    //                self.base64Str = convertImageToBase64(image: thumbImage!)
+//    //                print("IMAGE base64 String: \(self.base64Str)")
+//    //              //  self.activityIndicator.startAnimating()
+//    //                if let decodeData = Data(base64Encoded: self.base64Str, options: .ignoreUnknownCharacters) {
+//    //                    print("DECODE",decodeData)
+//    //                    self.uploadImg =  UIImage(data: decodeData)
+//    //                    cell.editImg.isHidden = false
+//    //                    NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+//    //                    print("IMAGESHOW",self.uploadImg?.pngData())
+//    //                   // self.uploadVideoImageApi()
+//    //                }
+
+//    //              //  let decodedString = String(data: decodedData!, encoding: .utf8)!
+//    //    //  print("STRINGIMG",decodedString)
+//    //
+//    //            }
+//            }
+//        }
+        
     }
+
+    
+    func getThumbnailImageFromVideoUrl(url: URL, completion: @escaping ((_ image: UIImage?)->Void)) {
+        DispatchQueue.global().async { //1
+            let asset = AVAsset(url: url) //2
+            let avAssetImageGenerator = AVAssetImageGenerator(asset: asset) //3
+            avAssetImageGenerator.appliesPreferredTrackTransform = true //4
+            let thumnailTime = CMTimeMake(value: 2, timescale: 1) //5
+            do {
+                let cgThumbImage = try avAssetImageGenerator.copyCGImage(at: thumnailTime, actualTime: nil) //6
+                let thumbImage = UIImage(cgImage: cgThumbImage) //7
+                DispatchQueue.main.async { //8
+                    completion(thumbImage) //9
+                }
+            } catch {
+                print(error.localizedDescription) //10
+                DispatchQueue.main.async {
+                    completion(nil) //11
+                }
+            }
+        }
+    }
+    
+    @IBOutlet weak var searchBtn: UIButton!
+    @IBAction func sosButtonAction(_ sender: Any) {
+        let vc = self.storyboard?.instantiateViewController(identifier: "ChooseCategoryVC")
+       // vc?.modalPresentationStyle = .fullScreen
+        self.present(vc!, animated: true, completion: nil)
+    }
+    
     
     @IBAction func mapViewButtonTapped(_ sender: Any) {
         let controller1 = self.storyboard?.instantiateViewController(identifier: "TrackerMapVC") as! TrackerMapVC
-        
         let controller = SheetViewController(controller: controller1, sizes: [.fixed(600)])
         controller.topCornersRadius = 15
         controller.blurBottomSafeArea = true
@@ -130,17 +322,23 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
         self.present(controller, animated: false, completion: nil)
     }
     
-    
-    
     func setDatePicker(textfield: UITextField) {
         //Format Date
         datePicker.datePickerMode = .date
         //ToolBar
-        let toolbar = UIToolbar();
+     let toolbar =   UIToolbar(frame: CGRect(x: 0, y: UIScreen.main.bounds.size.height - 300, width: UIScreen.main.bounds.size.width, height: 100))
         toolbar.sizeToFit()
+        datePicker.autoresizingMask = .flexibleWidth
+
+       datePicker.frame = CGRect(x: 0.0, y: UIScreen.main.bounds.size.height - 300, width: UIScreen.main.bounds.size.width, height: 100)
+
+//        let datePickerPreferredSize = datePicker.systemLayoutSizeFitting(view.bounds.size)
+//        datePicker.frame = .init(x: 20, y: 100, width: datePickerPreferredSize.width, height: datePickerPreferredSize.height)
+    
         let doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(doneDatePicker));
         let spaceButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
         let cancelButton = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancelDatePicker));
+        
 
         toolbar.setItems([doneButton,spaceButton,cancelButton], animated: false)
         if self.formValues["Start Date"] != nil && self.formValues["Start Date"]?.count != 0{
@@ -153,6 +351,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
         textfield.inputAccessoryView = toolbar
         textfield.inputView = datePicker
     }
+    
 
     @objc func doneDatePicker(){
         let formatter = DateFormatter()
@@ -176,11 +375,75 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
         self.view.endEditing(true)
     }
     
+    @objc func tapImageSelectFullview(sender: UITapGestureRecognizer){
+        
+        
+//        let imgFullVC = self.storyboard?.instantiateViewController(withIdentifier: "ShowImageFullscreenVC") as! ShowImageFullscreenVC
+//        imgFullVC.drivingImageFullView = self.imgUrl
+//        print("imgFullVC.drivingImageFullView",imgFullVC.drivingImageFullView)
+//        imgFullVC.urlstring1 = self.urlString
+//        self.present(imgFullVC, animated: true, completion: nil)
+       
+//        self.DrivinglicenseUploadView.isHidden = false
+//        self.fullviewImageshow.isHidden = false
+        print("UNHIDE")
+        
+//        let alertView = UIAlertView(title: "Alert", message: "Alert + Image", delegate: nil, cancelButtonTitle: "OK")
+//           let imvImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+//           imvImage.contentMode = UIView.ContentMode.center
+//            imvImage.image = UIImage(named: "hbhhhv")
+//           //alertView.view.addSubview(imvImage)
+//      //  alertView.image
+//           //alertView.setValue(imvImage, forKey: "accessoryView")
+//           alertView.show()
+//        let imageView = sender.view as! UIImageView
+//           let newImageView = UIImageView(image: imageView.image)
+//           newImageView.frame = UIScreen.main.bounds
+//        newImageView.backgroundColor = .black
+//        newImageView.contentMode = .scaleToFill
+//           newImageView.isUserInteractionEnabled = true
+//           let tap = UITapGestureRecognizer(target: self, action: "dismissFullscreenImage:")
+//           newImageView.addGestureRecognizer(tap)
+//           self.view.addSubview(newImageView)
+//        self.navigationController?.isNavigationBarHidden = true
+//        self.tabBarController?.tabBar.isHidden = true
+        
+        let imageView = sender.view as! UIImageView
+          let newImageView = UIImageView(image: imageView.image)
+          newImageView.frame = UIScreen.main.bounds
+          newImageView.backgroundColor = .black
+          newImageView.contentMode = .scaleAspectFit
+          newImageView.isUserInteractionEnabled = true
+          let tap = UITapGestureRecognizer(target: self, action: #selector(dismissFullscreenImage))
+          newImageView.addGestureRecognizer(tap)
+          self.view.addSubview(newImageView)
+          self.navigationController?.isNavigationBarHidden = true
+          self.tabBarController?.tabBar.isHidden = true
+    
+    }
+    
+    @objc func dismissFullscreenImage(sender: UITapGestureRecognizer) {
+        self.navigationController?.isNavigationBarHidden = false
+        self.tabBarController?.tabBar.isHidden = false
+        sender.view?.removeFromSuperview()
+    }
+    
+    
+    
+    
+    @IBAction func zipcodeAction(_ sender: Any) {
+        self.zipdropdown.isHidden = false
+
+    }
+    
+    
     @IBAction func openVideoGalleryBttn(_ sender: Any) {
         self.openVideoGallery()
     }
-    
-    func openVideoGallery() {
+       
+   
+    func openVideoGallery(){
+        
        let picker = UIImagePickerController()
         picker.delegate = self
         picker.sourceType = .savedPhotosAlbum
@@ -192,17 +455,18 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
         }
         picker.allowsEditing = false
         present(picker, animated: true, completion: nil)
+        
     }
+    
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
         if self.buttonName == "Self Help Videos"{
             if let url = info[.mediaURL] as? URL {
-                print(url)
+                print("URLBB",url)
                 self.VideoUrl = url
             }
-        }
-        else{
+        }else{
             if self.buttonName != "My Connections"{
                 self.uploadVideoIcon.isHidden = true
                 self.uploadVideoLbl.isHidden = true
@@ -220,27 +484,34 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
     
     func uploadSelfHelpVideo() {
         var data:Data?
-            var url:String = Defines.ServerUrl + Defines.selfHelpVideo
+        
+        let url:String = Defines.ServerUrl + Defines.selfHelpVideo
             do {
-                data = try Data(contentsOf: self.VideoUrl!, options: .mappedIfSafe)
+                data = try Data(contentsOf: self.VideoUrl, options: .mappedIfSafe)
 //                    print(data)
                 } catch  {
-                    self.view.makeToast("Error in selecting Video", duration: 3.0, position: .top)
+                    self.view.makeToast("Error in selecting Video", duration: 3.0, position: .bottom)
                     return
                 }
 
             let activityData = ActivityData()
             NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
-            
+        let userid : String =  UserDefaults.standard.object(forKey: "userid") as! String ?? "0"
+        
+
             let parameter:[String:String] = [
-                "user_id":UserData._id,
-                "title": self.videoTitleTF.text! ?? ""
+                "user_id": userid,
+                "title": self.videoTitleTF.text! ?? "",
+                "video_id": "1"
+                
             ]
             let timestamp = NSDate().timeIntervalSince1970
         
+         print("PARAMSVIDEO",parameter)
+        
             Alamofire.upload(multipartFormData: { multipartFormData in
                 multipartFormData.append(data!, withName: "file" ,fileName: "\(timestamp).mp4", mimeType: "\(timestamp)/mp4")
-    //            multipartFormData.append(imgData, withName: name ,fileName: "file.jpg", mimeType: "image/jpg")
+                //multipartFormData.append(data!, withName: "thumbnail" ,fileName: "file.jpg", mimeType: "image/jpg")
                 for (key, value) in parameter {
                     multipartFormData.append(value.data(using: String.Encoding.utf8)!, withName: key)
                 }
@@ -261,13 +532,77 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                         print(response.result.value!)
                         let json = JSON(response.result.value!)
                         print(json)
+                        self.videoIDStr = json["video_id"].stringValue
+                        print("VIDEOSTR",self.videoIDStr)
+                        print("NEWVIDEO",self.VideoUrl)
+                        let newurl = URL(string: url)
+                        print("checking",newurl)
+
+                        self.getThumbnailImageFromVideoUrl(url: self.VideoUrl) { (thumbImage) in
+                            if (thumbImage == nil) {
+                             //   NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+                              print("NoImage")
+
+                            }else{
+                                print("SHOWIMGURL",thumbImage)
+                                
+                                self.newImg = thumbImage
+                                print("SHOWIMGURL1",self.newImg)
+                                self.uploadVideoImageApi()
+//                                let imageStringData = convertImageToBase64(image: thumbImage!)
+//                    print("IMAGE base64 String: \(imageStringData)")
+                               // cell.videoThumbnail.image = thumbImage!
+                               // NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+                            }
+                        }
+                        
+//                        if (url == nil) {
+//                          //  let activityData = ActivityData()
+//                          // print
+//                            //NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
+//                                      //  cell.videoThumbnail.image = UIImage(named: "image-1")
+//                            print("NILURL")
+//                                    }else{
+//                                        let newurl = URL(string: url)
+//                                        self.getThumbnailImageFromVideoUrl(url: newurl!) { (thumbImage) in
+//                                            if (thumbImage == nil) {
+//
+//                                             //   NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+//                                              print("NoImage")
+//
+//                                            }else{
+//
+//                                                print("SHOWIMGURL",thumbImage)
+//
+//                                                let imageStringData = convertImageToBase64(image: thumbImage!)
+//                                    print("IMAGE base64 String: \(imageStringData)")
+//
+//                                               // cell.videoThumbnail.image = thumbImage!
+//                                               // NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+//
+//
+//                                            }
+//                                        }
+//
+//                                    }
                         if json["status"].stringValue == "200" {
                             self.VideoUrl = nil
                             self.videoTitleTF.text = nil
-                            self.view.makeToast("Video uploaded successfully", duration: 3.0, position: .top)
-                            self.getVideosList()
+                            
+
+                          //  self.view.makeToast("Video uploaded successfully", duration: 3.0, position: .bottom)
+                            self.view.makeToast("Video uploaded successfully", duration: 3.0, position: .bottom)
+
+//                            Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Video uploaded successfully", withError: nil, onClose: {
+//                                return
+//                            })
+
+                          //  self.getVideosList()
                         }else {
-                            self.view.makeToast("Video upload failed", duration: 3.0, position: .top)
+                            self.view.makeToast("Video upload failed", duration: 3.0, position: .bottom)
+//                            Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Video upload failed", withError: nil, onClose: {
+//                                return
+//                            })
                         }
                     }
                     
@@ -277,6 +612,9 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                 }
             }
         }
+    
+    
+   
     
     func uploadConnections() {
         if  !Reachability.isConnectedToNetwork() {
@@ -340,9 +678,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                 let url:String = Defines.ServerUrl + Defines.uploadConnection
                 
                 data = self.drivingLicenseImg?.pngData()
-    //                    print(data)
-                    
-
+                        //print(data)
                 let activityData = ActivityData()
                 NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
                 
@@ -353,9 +689,10 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                 else{
                     status = "0"
                 }
-        
+        let userid : String =  UserDefaults.standard.object(forKey: "userid") as! String ?? "0"
+
                 let parameter:[String:String] = [
-                    "user_id":UserData._id,
+                    "user_id": "2",
                     "name":self.formValues["Name"]!,
                     "phone_number":self.formValues["Mobile Number"]!,
                     "location":self.formValues["Location"]!,
@@ -398,7 +735,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                 self.myConnections.removeAll()
                                 self.getConnectionList()
                             }else {
-                                self.view.makeToast("Video upload failed", duration: 3.0, position: .top)
+                                self.view.makeToast("Video upload failed", duration: 3.0, position: .bottom)
                             }
                         }
                     case .failure(let encodingError):
@@ -408,24 +745,29 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                 }
             }
     
+
+    let userid : String =  UserDefaults.standard.object(forKey: "userid") as! String ?? "0"
     
     
     func uploadDrivingLicense() {
+        
+        if  !Reachability.isConnectedToNetwork() {
+            self.VehicalregistrationAddMoreView.isHidden = true
+                    Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: Defines.noInterNet)
+                        return
+                }
+
             var data:Data?
             self.view.endEditing(true)
                 var url:String = Defines.ServerUrl + Defines.uploadDL
-                    
                 data =  self.drivingLicenseImg!.pngData()
-
                 let activityData = ActivityData()
                 NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
-                
-                let parameter:[String:String] = [
-                    "user_id":UserData._id
+                    let parameter:[String:String] = [
+                    "user_id": userid
                 ]
                 let timestamp = NSDate().timeIntervalSince1970
-            
-                Alamofire.upload(multipartFormData: { multipartFormData in
+        Alamofire.upload(multipartFormData: { multipartFormData in
                     multipartFormData.append(data!, withName: "files" ,fileName: "\(timestamp).png", mimeType: "\(timestamp)/png")
         //            multipartFormData.append(imgData, withName: name ,fileName: "file.jpg", mimeType: "image/jpg")
                     for (key, value) in parameter {
@@ -444,9 +786,8 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                         
                         upload.responseJSON { response in
                             print(response)
-                            NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
-                            print(response.result.value!)
-                            let json = JSON(response.result.value!)
+                         //   print(response.result.value!)
+                            let json = JSON(response.result.value)
                             print(json)
                             if json["status"].stringValue == "200" {
                                 self.drivingLicenseImg = nil
@@ -454,35 +795,108 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                 self.uploadVideoIcon.isHidden = false
                                 self.uploadVideoLbl.isHidden = false
                                 self.uploadVideoBGImageView.image = UIImage(named: "myaacounbckgroundt2img")
-                                self.view.makeToast("Driving License uploaded successfully", duration: 3.0, position: .top)
-                                self.getDrivingLicenseList()
+//                                Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage:"Driving License uploaded successfully", withError: nil, onClose: {
+//                                    return
+//                                })
+                                self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .bottom)
+                             //   DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
+                                 //   self.atteorneysTable.isHidden = true
+                                    self.getDrivingLicenseList()
+                                    self.atteorneysTable.reloadData()
+                             //   })
                             }else {
-                                self.view.makeToast("Task failed", duration: 3.0, position: .top)
+                                self.view.makeToast("Task failed", duration: 3.0, position: .bottom)
                             }
                         }
-                        
                     case .failure(let encodingError):
                         NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                         print(encodingError)
                     }
                 }
-                
-                
-                
+            }
+    
+    func uploadVideoImageApi() {
+            var data:Data?
+            self.view.endEditing(true)
+                var url:String = Defines.ServerUrl + Defines.uploadVideoImg
+                data =  self.newImg!.pngData()
+                let activityData = ActivityData()
+                NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
+                    let parameter:[String:String] = [
+                    "user_id": userid,
+                    "video_id": self.videoIDStr
+                ]
+                let timestamp = NSDate().timeIntervalSince1970
+        Alamofire.upload(multipartFormData: { multipartFormData in
+                    multipartFormData.append(data!, withName: "file" ,fileName: "\(timestamp).png", mimeType: "\(timestamp)/png")
+        //            multipartFormData.append(imgData, withName: name ,fileName: "file.jpg", mimeType: "image/jpg")
+                    for (key, value) in parameter {
+                        multipartFormData.append(value.data(using: String.Encoding.utf8)!, withName: key)
+                    }
+                }, to: url)
+                { (result) in
+                    switch result {
+                    case .success(let upload, _, _):
+                        
+                        upload.uploadProgress(closure: { (progress) in
+                            let activityData = ActivityData()
+                            NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
+                            print("Upload Progress: \(progress.fractionCompleted)")
+                        })
+                        
+                        upload.responseJSON { response in
+                            print(response)
+                            NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+                           // print(response.result.value!)
+                            let json = JSON(response.result.value)
+                            print(json)
+                            if json["status"].stringValue == "200" {
+                               // self.videosCOllection.reloadData()
+                                self.getVideosList()
+                                self.videosCOllection.reloadData()
+
+//                                self.drivingLicenseImg = nil
+//                                self.videoTitleTF.text = nil
+//                                self.uploadVideoIcon.isHidden = false
+//                                self.uploadVideoLbl.isHidden = false
+//                                self.uploadVideoBGImageView.image = UIImage(named: "myaacounbckgroundt2img")
+//                                Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
+//                                    return
+//                                })
+                                print("UPLOADEDSUCESSFULLY",json["msg"].stringValue)
+                                
+//                                self.view.makeToast("Driving License uploaded successfully", duration: 3.0, position: .top)
+//                                self.getDrivingLicenseList()
+
+                            }else {
+                                self.view.makeToast("Task failed", duration: 3.0, position: .bottom)
+//                                Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Task failed", withError: nil, onClose: {
+//                            return
+//                        })
+                            }
+                        }
+                    case .failure(let encodingError):
+                        NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+                        print(encodingError)
+                    }
+                }
             }
     
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         self.dismiss(animated: true, completion: nil)
     }
-    
+
+
     func getRegisteredVehicles(){
             if  !Reachability.isConnectedToNetwork() {
                 Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: Defines.noInterNet)
                     return
             }
+        let userid : String =  UserDefaults.standard.object(forKey: "userid") as! String ?? "0"
+
             let parameter:[String:String] = [
-                "user_id":UserData._id
+                "user_id": userid
             ]
             print("\nThe parameters for Dashboard : \(parameter)\n")
             let activityData = ActivityData()
@@ -497,11 +911,12 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                         self.registeredVehicles = data
 //                                        self.addVideosButton.isHidden = false
                                         self.addMoreButton.isHidden = false
+                                        self.addMoreButton.setTitle("Add more", for: .normal)
                                         self.atteorneysTable.isHidden = false
                                         self.atteorneysTable.reloadData()
                                     }
                                 }else {
-                                    self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .top)
+                              //  self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .bottom)
                                     self.atteorneysTable.isHidden = false
                                     self.registeredVehicles.removeAll()
                                     self.atteorneysTable.reloadData()
@@ -511,14 +926,17 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                 NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                             }
         }
+
     
     func getTrackerLists(){
             if  !Reachability.isConnectedToNetwork() {
                 Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: Defines.noInterNet)
                     return
             }
+        let userid : String =  UserDefaults.standard.object(forKey: "userid") as! String ?? "0"
+
             let parameter:[String:String] = [
-                "user_id":UserData._id
+                "user_id": userid
             ]
             print("\nThe parameters for Dashboard : \(parameter)\n")
             let activityData = ActivityData()
@@ -536,7 +954,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                         self.atteorneysTable.reloadData()
                                     }
                                 }else {
-                                    self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .top)
+                                    self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .bottom)
                                     self.atteorneysTable.isHidden = false
                                     self.registeredVehicles.removeAll()
                                     self.atteorneysTable.reloadData()
@@ -552,19 +970,24 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                 Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: Defines.noInterNet)
                     return
             }
+        let userid : String =  UserDefaults.standard.object(forKey: "userid") as! String ?? "0"
+
             let parameter:[String:String] = [
-                "user_id":UserData._id
+                "user_id": userid
             ]
             print("\nThe parameters for Dashboard : \(parameter)\n")
             let activityData = ActivityData()
             NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
             
             DataProvider.sharedInstance.getDataFromRegister(path: Defines.ServerUrl + Defines.getVideoList, dataDict: parameter, { (json) in
-    //                            print(json)
-                                NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+                NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                                 if json["status"].stringValue == "200" {
+
                                     if let data = json["data"].array{
                                         self.videosList = data
+                                        
+                                        self.videosCOllection.reloadData()
+
                                         self.videosCOllection.delegate = self
                                         self.videosCOllection.dataSource = self
                                         self.uploadVideoNoVideoView1.isHidden = true
@@ -573,9 +996,10 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                         self.videosCOllection.isHidden = false
                                         self.addVideosButton.isHidden = false
                                         self.videosCOllection.reloadData()
+
                                     }
                                 }else {
-                                    self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .top)
+                                   // self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .bottom)
                                     self.uploadVideoNoVideoView1.isHidden = false
                                     self.uploadVideoBtn.isHidden = false
                                     self.atteorneysTable.isHidden = true
@@ -586,7 +1010,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                 }
                             }) { (error) in
                                 print(error)
-                                NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+                              //  NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                             }
         }
     
@@ -595,19 +1019,24 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                 Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: Defines.noInterNet)
                     return
             }
+        let userid : String =  UserDefaults.standard.object(forKey: "userid") as! String ?? "0"
             let parameter:[String:String] = [
-                "user_id":UserData._id
+                "user_id": userid
             ]
             print("\nThe parameters for Dashboard : \(parameter)\n")
             let activityData = ActivityData()
-            NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
-            
+        NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
+        drivingLicenseImage.removeAll()
             DataProvider.sharedInstance.getDataFromRegister(path: Defines.ServerUrl + Defines.getDrivingLicenceList, dataDict: parameter, { (json) in
     //                            print(json)
-                                NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+                NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                                 if json["status"].stringValue == "200" {
+                                  //  self.deleteImg.isHidden = true
                                     if let data = json["data"].array{
                                         self.drivingLicenseImage = data
+                                        
+                                      //  self.atteorneysTable.reloadData()
+                                      
 //                                        self.atteorneysTable.delegate = self
 //                                        self.atteorneysTable.dataSource = self
                                         self.uploadVideoNoVideoView1.isHidden = true
@@ -620,7 +1049,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                         self.atteorneysTable.reloadData()
                                     }
                                 }else {
-                                    self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .top)
+                                  //  self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .bottom)
                                     self.uploadVideoNoVideoView1.isHidden = true
                                     self.uploadVideoBtn.isHidden = true
                                     self.videoTitleTF.placeholder = "Image Name"
@@ -637,6 +1066,68 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                 print(error)
                                 NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                             }
+              }
+    
+    
+    func editvideoApi(){
+            if  !Reachability.isConnectedToNetwork() {
+                Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: Defines.noInterNet)
+                    return
+            }
+        
+        let userid : String =  UserDefaults.standard.object(forKey: "userid") as! String ?? "0"
+        
+        print("VIDEOIDSTR",self.getvideoid!)
+            let parameter:[String:String] = [
+                "user_id": userid,
+                "video_id": String(self.getvideoid!),
+                "title": self.videoTitleTF.text!
+            ]
+            print("\nThe parameters for editvideo : \(parameter)\n")
+            let activityData = ActivityData()
+            NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
+            
+            DataProvider.sharedInstance.getDataFromRegister(path: Defines.ServerUrl + Defines.editselfHelpVideo, dataDict: parameter, { (json) in
+    //                            print(json)
+                                if json["status"].stringValue == "200" {
+                                    self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .bottom)
+
+                                    
+                                   // self.uploadVideoImageApi()
+                                    self.getVideosList()
+                                    
+//                                    if let data = json["data"].array{
+////                                        self.videosList = data
+////
+////                                        self.videosCOllection.reloadData()
+////
+////                                        self.videosCOllection.delegate = self
+////                                        self.videosCOllection.dataSource = self
+////                                        self.uploadVideoNoVideoView1.isHidden = true
+////                                        self.uploadVideoView2.isHidden = true
+////                                        self.atteorneysTable.isHidden = true
+////                                        self.videosCOllection.isHidden = false
+////                                        self.addVideosButton.isHidden = false
+////                                        self.videosCOllection.reloadData()
+//
+//                                    }
+//                                }else {
+//                                    Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
+//                                        return
+//                                    })
+                                  //  self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .top)
+//                                    self.uploadVideoNoVideoView1.isHidden = false
+//                                    self.uploadVideoBtn.isHidden = false
+//                                    self.atteorneysTable.isHidden = true
+//                                    self.addVideosButton.isHidden = true
+//                                    self.videosCOllection.isHidden = true
+//                                    self.videosList.removeAll()
+//                                    self.videosCOllection.reloadData()
+                                }
+                            }) { (error) in
+                                print(error)
+                              //  NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+                            }
         }
     
     
@@ -648,38 +1139,143 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                             return
                     }
             
-                    if self.formValues["Vehicle Name"]!.count == 0 {
-                        Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter Vehicle name!")
+                    if self.formValues["Vehicle Name"]!.count == 0{
+                        self.view.makeToast("Please enter Vehicle name!", duration: 3.0, position: .bottom)
+                      //  Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter Vehicle name!")
                            // self.usernameText.becomeFirstResponder()
                             return
                     }
+        
+        if !(self.formValues["Vehicle Name"]!.trimmingCharacters(in: .whitespaces).isEmpty) {
+                    // string contains non-whitespace characters
+                    print("text has no spaces")
+                    print(self.formValues["Vehicle Name"]! ?? "")
+        } else {
+                    print("text length",self.formValues["Vehicle Name"]!.count ?? 0)
+                    print("text has spaces")
+        self.view.makeToast("Please enter Vehicle name!", duration: 3.0, position: .bottom)
+                return
+                }
+        
+        
                     if self.formValues["Model Number"]!.count == 0 {
-                        Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter model number!")
+                        self.view.makeToast("Please enter model number!", duration: 3.0, position: .bottom)
+                      //  Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter model number!")
                            // self.usernameText.becomeFirstResponder()
                             return
                     }
-                    if self.formValues["Vehicle Number"]!.count == 0 {
-                        Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter vehicle number!")
+        
+        
+        if !(self.formValues["Model Number"]!.trimmingCharacters(in: .whitespaces).isEmpty) {
+                    // string contains non-whitespace characters
+                    print("text has no spaces")
+                    print(self.formValues["Model Number"]! ?? "")
+        } else {
+                    print("text length",self.formValues["Model Number"]!.count ?? 0)
+                    print("text has spaces")
+        self.view.makeToast("Please enter model number!", duration: 3.0, position: .bottom)
+                return
+                }
+        
+        
+        
+        if self.formValues["Vehicle Number"]!.count == 0  {
+            self.view.makeToast("Please enter vehicle number!", duration: 3.0, position: .bottom)
+
+                       // Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter vehicle number!")
                            // self.usernameText.becomeFirstResponder()
                             return
                     }
-                    if self.formValues["Model Year"]!.count == 0 {
-                        Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter model year!")
+        
+        if !(self.formValues["Vehicle Number"]!.trimmingCharacters(in: .whitespaces).isEmpty) {
+                    // string contains non-whitespace characters
+                    print("text has no spaces")
+                    print(self.formValues["Vehicle Number"]! ?? "")
+        } else {
+                    print("text length",self.formValues["Vehicle Number"]!.count ?? 0)
+                    print("text has spaces")
+        self.view.makeToast("Please enter vehicle number!", duration: 3.0, position: .bottom)
+                return
+                }
+        
+                    if self.formValues["Model Year"]!.count == 0  {
+                        self.view.makeToast("Please enter model year!", duration: 3.0, position: .bottom)
+
+                    //    Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter model year!")
                            // self.usernameText.becomeFirstResponder()
                             return
                     }
+        
+        if !(self.formValues["Model Year"]!.trimmingCharacters(in: .whitespaces).isEmpty) {
+                    // string contains non-whitespace characters
+                    print("text has no spaces")
+                    print(self.formValues["Model Year"]! ?? "")
+        } else {
+                    print("text length",self.formValues["Model Year"]!.count ?? 0)
+                    print("text has spaces")
+        self.view.makeToast("Please enter model year!", duration: 3.0, position: .bottom)
+                return
+                }
                     if self.formValues["Registration Number"]!.count == 0 {
-                        Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter registration number!")
+                        self.view.makeToast("Please enter registration number!", duration: 3.0, position: .bottom)
+
+                       // Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter registration number!")
                            // self.usernameText.becomeFirstResponder()
                             return
                     }
-                    if self.formValues["License Plate Number"]!.count == 0 {
-                        Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter license plate number!")
+        
+        if !(self.formValues["Registration Number"]!.trimmingCharacters(in: .whitespaces).isEmpty) {
+                    // string contains non-whitespace characters
+                    print("text has no spaces")
+                    print(self.formValues["Registration Number"]! ?? "")
+        } else {
+                    print("text length",self.formValues["Registration Number"]!.count ?? 0)
+                    print("text has spaces")
+        self.view.makeToast("Please enter registration number!", duration: 3.0, position: .bottom)
+                return
+                }
+        
+        if self.formValues["VIN Number"]!.count == 0  {
+            self.view.makeToast("Please enter VIN Number!", duration: 3.0, position: .bottom)
+          //  Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter license plate number!")
+               // self.usernameText.becomeFirstResponder()
+                return
+        }
+
+if !(self.formValues["VIN Number"]!.trimmingCharacters(in: .whitespaces).isEmpty) {
+        // string contains non-whitespace characters
+        print("text has no spaces")
+        print(self.formValues["VIN Number"]! ?? "")
+} else {
+        print("text length",self.formValues["VIN Number"]!.count ?? 0)
+        print("text has spaces")
+self.view.makeToast("Please enter VIN Number!", duration: 3.0, position: .bottom)
+    return
+    }
+                
+                    if self.formValues["License Plate Number"]!.count == 0  {
+                        self.view.makeToast("Please enter license plate number!", duration: 3.0, position: .bottom)
+                      //  Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter license plate number!")
                            // self.usernameText.becomeFirstResponder()
                             return
                     }
+        
+        if !(self.formValues["License Plate Number"]!.trimmingCharacters(in: .whitespaces).isEmpty) {
+                    // string contains non-whitespace characters
+                    print("text has no spaces")
+                    print(self.formValues["License Plate Number"]! ?? "")
+        } else {
+                    print("text length",self.formValues["License Plate Number"]!.count ?? 0)
+                    print("text has spaces")
+        self.view.makeToast("Please enter license plate number!", duration: 3.0, position: .bottom)
+                return
+                }
+        
+        let userid : String =  UserDefaults.standard.object(forKey: "userid") as! String ?? "0"
+        
+        
                     let parameter:[String:String] = [
-                        "user_id": UserData._id,
+                        "user_id": userid,
                         "vehicle_name":self.formValues["Vehicle Name"]!,
                         "model_number":self.formValues["Model Number"]!,
                         "vehicle_number":self.formValues["Vehicle Number"]!,
@@ -695,19 +1291,32 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                         print(json)
                         NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                         if json["status"].stringValue == "200" {
-                            NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+                            self.addMoreButton.setTitle("Add More", for: . normal)
+
+                            self.newLbl.isHidden = true
+
                             self.formValues.removeAll()
                             self.formValues = self.formValues1
 //                            json["msg"].stringValue
-                            self.view.makeToast("successfully uploaded vehicle registration!", duration: 3.0, position: .top)
+                            self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .bottom)
+//                            Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
+//                                return
+//                            })
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
                                 self.atteorneysTable.isHidden = true
                                 self.getRegisteredVehicles()
                             })
                         }else {
-                            Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
-                                return
-                            })
+                            
+                            let message = json["msg"].stringValue
+                            print("MESSAGE",message)
+                            self.newLbl.isHidden = false
+                            self.newLbl.text! = message
+                            print("MESSAGELABEL",self.newLbl.text!)
+
+//                            Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
+//                                return
+//                            })
 
             //                let banner = NotificationBanner(title: "Alert", subtitle: json["msg"].stringValue , style: .danger)
             //                banner.show(queuePosition: .front)
@@ -726,8 +1335,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                         return
                 }
                     let parameter:[String:String] = [
-                    "zipcode": UserData.ZipCode
-    //                "user_id":"2"
+                        "zipcode": self.userzipcodeLbl.text ?? ""
                 ]
                 
                 print("\nThe parameters for Dashboard : \(parameter)\n")
@@ -739,7 +1347,9 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
         //                            print(json)
                                     NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                                     if json["status"].stringValue == "200" {
-                                        
+
+                                        self.newLbl.isHidden = true
+
                                         if let data = json["data"].array{
                                             self.atorneyList = data
                                             self.atteorneysTable.isHidden = false
@@ -749,25 +1359,32 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                         DispatchQueue.main.async {
                                             self.atteorneysTable.reloadData()
                                         }
+                                        self.atteorneysTable.reloadData()
+                                      
                                     }else {
-                                        self.atorneyList.removeAll()
-                                        Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
-                                            return
-                                        })
+                                        self.newLbl.isHidden = false
+
+                                        let message = json["msg"].stringValue
+                                        print("MESSAGE",message)
+                                        self.newLbl.isHidden = false
+                                        self.newLbl.text! = message
+                                        print("MESSAGELABEL",self.newLbl.text!)
+
                                     }
                                 }) { (error) in
                                     print(error)
                                     NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                                 }
             }
-            func getConnectionList(){
+    
+    
+            func getConnectionList() {
                 if  !Reachability.isConnectedToNetwork() {
                     Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: Defines.noInterNet)
                         return
                 }
                     let parameter:[String:String] = [
                         "user_id": UserData._id
-    //                "user_id":"2"
                 ]
                 
                 print("\nThe parameters for Dashboard : \(parameter)\n")
@@ -800,6 +1417,8 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                     NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                                 }
             }
+    
+    
         func getBailBondList(){
                     if  !Reachability.isConnectedToNetwork() {
                         Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: Defines.noInterNet)
@@ -807,8 +1426,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                     }
                     
                     let parameter:[String:String] = [
-                        "zipcode": UserData.ZipCode
-        //                "user_id":"2"
+                        "zipcode": self.userzipcodeLbl.text ?? ""
                     ]
                     
                     print("\nThe parameters for Dashboard : \(parameter)\n")
@@ -820,9 +1438,10 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
             //                            print(json)
                                         NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                                         if json["status"].stringValue == "200" {
-                                            
+                                            self.newLbl.isHidden = true
+
                                             if let data = json["data"].array{
-                                                self.atorneyList = data
+                                                self.bailBondList = data
                                                 self.atteorneysTable.isHidden = false
                                                 self.atteorneysTable.reloadData()
                                             }
@@ -831,12 +1450,11 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                                 self.atteorneysTable.reloadData()
                                             }
                                         }else {
-                                            self.atorneyList.removeAll()
-                                            Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
-                                                return
-                                            })
+                                            let message = json["msg"].stringValue
+                                            print("MESSAGE",message)
+                                            self.newLbl.text = message
+                                            self.newLbl.isHidden = false
                                         }
-                                        
                                     }) { (error) in
                                         print(error)
                                         NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
@@ -844,6 +1462,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                 }
     
     
+        let useridnew : String =  UserDefaults.standard.object(forKey: "userid") as! String ?? "0"
     
     func getinsuredVehicles(){
             if  !Reachability.isConnectedToNetwork() {
@@ -851,7 +1470,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                     return
             }
             let parameter:[String:String] = [
-                "user_id":UserData._id
+                "user_id": useridnew
             ]
             print("\nThe parameters for Dashboard : \(parameter)\n")
             let activityData = ActivityData()
@@ -869,7 +1488,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                 }
             }else {
                 self.insuredVehicles.removeAll()
-                self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .top)
+              //  self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .bottom)
                 self.atteorneysTable.isHidden = false
                 self.atteorneysTable.reloadData()
             }
@@ -886,42 +1505,109 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                         return
                 }
                 if self.formValues["Insurance Name"]!.count == 0 {
-                    Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter insurance name!")
+                    self.view.makeToast("Please enter insurance name!", duration: 3.0, position: .bottom)
+
+                 //   Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter insurance name!")
                        // self.usernameText.becomeFirstResponder()
                         return
                 }
+        
+        if !(self.formValues["Insurance Name"]!.trimmingCharacters(in: .whitespaces).isEmpty) {
+                    // string contains non-whitespace characters
+                    print("text has no spaces")
+                    print(self.formValues["Insurance Name"]! ?? "")
+        } else {
+                    print("text length",self.formValues["Insurance Name"]!.count ?? 0)
+                    print("text has spaces")
+        self.view.makeToast("Please enter insurance name!", duration: 3.0, position: .bottom)
+                return
+                }
+        
                 if self.formValues["Start Date"]!.count == 0 {
-                    Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter start date!")
+                    
+                    self.view.makeToast("Please enter start date!", duration: 3.0, position: .bottom)
+
+                  //  Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter start date!")
                        // self.usernameText.becomeFirstResponder()
                         return
                 }
                 if self.formValues["Expire Date"]!.count == 0 {
-                    Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter expire date!")
+                    self.view.makeToast("Please enter expire date!", duration: 3.0, position: .bottom)
+                    
+                //    Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter expire date!")
                        // self.usernameText.becomeFirstResponder()
                         return
                 }
                 if self.formValues["Policy Number"]!.count == 0 {
-                    Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter policy number!")
+                    self.view.makeToast("Please enter policy number!", duration: 3.0, position: .bottom)
+                    
+                  //  Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter policy number!")
                        // self.usernameText.becomeFirstResponder()
                         return
                 }
-                if self.formValues["Liability Coverage "]!.count == 0 {
-                    Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter liability coverage amount!")
+        
+        if !(self.formValues["Policy Number"]!.trimmingCharacters(in: .whitespaces).isEmpty) {
+                    // string contains non-whitespace characters
+                    print("text has no spaces")
+                    print(self.formValues["Policy Number"]! ?? "")
+        } else {
+                    print("text length",self.formValues["Policy Number"]!.count ?? 0)
+                    print("text has spaces")
+        self.view.makeToast("Please enter policy number!", duration: 3.0, position: .bottom)
+                return
+                }
+        
+                if self.formValues["Liability Coverage"]!.count == 0 {
+                    
+                    self.view.makeToast("Please enter liability coverage amount!", duration: 3.0, position: .bottom)
+                    
+                //    Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter liability coverage amount!")
                        // self.usernameText.becomeFirstResponder()
                         return
                 }
+        
+        if !(self.formValues["Liability Coverage"]!.trimmingCharacters(in: .whitespaces).isEmpty) {
+                    // string contains non-whitespace characters
+                    print("text has no spaces")
+                    print(self.formValues["Liability Coverage"]! ?? "")
+        } else {
+                    print("text length",self.formValues["Liability Coverage"]!.count ?? 0)
+                    print("text has spaces")
+        self.view.makeToast("Please enter liability coverage amount!", duration: 3.0, position: .bottom)
+                return
+                }
+        
+        
                 if self.formValues["Comp and Collission Coverage"]!.count == 0 {
-                    Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter Comp and Collission Coverage amount!")
+                    self.view.makeToast("Please enter Comp and Collission Coverage amount!", duration: 3.0, position: .bottom)
+                    
+                   // Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter Comp and Collission Coverage amount!")
                        // self.usernameText.becomeFirstResponder()
                         return
                 }
+        
+        
+        if !(self.formValues["Comp and Collission Coverage"]!.trimmingCharacters(in: .whitespaces).isEmpty) {
+                    // string contains non-whitespace characters
+                    print("text has no spaces")
+                    print(self.formValues["Comp and Collission Coverage"]! ?? "")
+        } else {
+                    print("text length",self.formValues["Comp and Collission Coverage"]!.count ?? 0)
+                    print("text has spaces")
+        self.view.makeToast("Please enter Comp and Collission Coverage amount!", duration: 3.0, position: .bottom)
+                return
+                }
+        
+        
+        let userid : String =  UserDefaults.standard.object(forKey: "userid") as! String ?? "0"
+
                 let parameter:[String:String] = [
-                    "user_id": UserData._id,
+                    "user_id": userid,
                     "insurance_name":self.formValues["Insurance Name"]!,
                     "start_date":self.formValues["Start Date"]!,
                     "expire_date":self.formValues["Expire Date"]!,
                     "policy_number":self.formValues["Policy Number"]!,
-                    "liability_coverage_amount":self.formValues["Liability Coverage "]!,
+                    "liability_coverage_amount":self.formValues["Liability Coverage"]!,
                     "comp_coverage_amount":self.formValues["Comp and Collission Coverage"]!
                 ]
                 print("\nThe parameters for login : \(parameter)\n")
@@ -932,8 +1618,14 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                     print(json)
                     NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                     if json["status"].stringValue == "200" {
-                        NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
-                        self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .top)
+                        self.addMoreButton.setTitle("Add More", for: . normal)
+
+                        self.newLbl.isHidden = true
+
+//                        Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
+//                            return
+//                        })
+                        self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .bottom)
                         self.formValues.removeAll()
                         self.formValues = self.formValues1
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
@@ -941,9 +1633,15 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                             self.getinsuredVehicles()
                         })
                     }else {
-                        Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
-                            return
-                        })
+                     //   self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .bottom)
+                        let message = json["msg"].stringValue
+                        print("MESSAGE",message)
+                        self.newLbl.text = message
+                        self.newLbl.isHidden = false
+                        
+//                        Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
+//                            return
+//                        })
 
         //                let banner = NotificationBanner(title: "Alert", subtitle: json["msg"].stringValue , style: .danger)
         //                banner.show(queuePosition: .front)
@@ -958,18 +1656,23 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
     @IBAction func addMoreButton(_ sender: Any) {
         if buttonName == "Vehicle Registration"{
         self.VehicalregistrationAddMoreView.isHidden = true
+           // self.addMoreButton.isHidden = true
+            self.addMoreButton.setTitle("Save", for: .normal)
+
         self.registeredVehicles.removeAll()
         print(self.registeredVehicles.count)
         self.atteorneysTable.reloadData()
-        self.addMoreButton.isHidden = true
+        
         }
         else if buttonName == "Vehicle Insurance"
         {
             self.VehicalregistrationAddMoreView.isHidden = true
+          //  self.addMoreButton.isHidden = true
+            self.addMoreButton.setTitle("Save", for: .normal)
+
             self.insuredVehicles.removeAll()
             print(self.insuredVehicles.count)
             self.atteorneysTable.reloadData()
-            self.addMoreButton.isHidden = true
         }
         else if buttonName == "My Connections"
         {
@@ -987,58 +1690,148 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
     }
      
     @IBAction func addVideosBttnTapped(_ sender: Any) {
-        self.uploadVideoNoVideoView1.isHidden = true
+        
+//        videoUploadCollectionView.isHidden = true
+//        self.uploadVideoNoVideoView1.isHidden = false
+//        self.uploadVideoView2.isHidden = false
+//        self.uploadDrivingLicenseBtn.isHidden = true
+//        videouploadBtn.isHidden = false
+//        uploadVideoBtn.isHidden = false
+        
+        
+        
+       self.uploadVideoNoVideoView1.isHidden = true
         self.uploadVideoView2.isHidden = false
+        self.openVideoGalleryBttn.isHidden = false
+        self.uploadDrivingLicenseBtn.isHidden = true
         self.videouploadBtn.isHidden = false
         self.uploadVideoBtn.isHidden = false
         self.atteorneysTable.isHidden = true
         self.addVideosButton.isHidden = true
         self.videosCOllection.isHidden = true
-        self.videosList.removeAll()
-        self.videosCOllection.reloadData()
+////        self.videosList.removeAll()
+//        self.videosCOllection.reloadData()
     }
     
     @IBAction func onpressedUploadDrivingLicesenseBtn(_ sender: Any)
     {
         if self.drivingLicenseImg != nil{
-            self.uploadDrivingLicense()
-            self.uploadVideoBtn.isHidden = true
-            self.DrivinglicenseUploadView.isHidden = true
-            self.uploadVideoView2.isHidden = true
-            self.videouploadBtn.isHidden = true
-            SosBtn.isHidden = false
-            Savebtn.isHidden = true
+            if self.videoTitleTF.text == ""{
+                self.view.makeToast("please enter image name", duration: 3.0, position: .bottom)
+              
+//            if !(videoTitleTF.text?.trimmingCharacters(in: .whitespaces).isEmpty)! {
+//                        // string contains non-whitespace characters
+//                        print("text has no spaces")
+//                        print(videoTitleTF.text ?? "")
+//            } else {
+//                        print("text length",videoTitleTF.text?.count ?? 0)
+//                        print("text has spaces")
+//                        self.view.makeToast("Please enter Image name!", duration: 3.0, position: .bottom
+//                        )
+//                    return
+//                    }
+            
+            }  else{
+                if !(videoTitleTF.text?.trimmingCharacters(in: .whitespaces).isEmpty)! {
+                            // string contains non-whitespace characters
+                            print("text has no spaces")
+                            print(videoTitleTF.text ?? "")
+                } else {
+                            print("text length",videoTitleTF.text?.count ?? 0)
+                            print("text has spaces")
+                            self.view.makeToast("Please enter image name", duration: 3.0, position: .bottom
+                            )
+                        return
+                        }
+                self.uploadDrivingLicense()
+                self.uploadVideoBtn.isHidden = true
+                self.DrivinglicenseUploadView.isHidden = true
+                self.uploadVideoView2.isHidden = true
+                self.videouploadBtn.isHidden = true
+                SosBtn.isHidden = false
+                Savebtn.isHidden = true
+                
+            }
+           
         }
         else{
-            self.view.makeToast("Select image first", duration: 3.0, position: .top)
+           self.view.makeToast("Select image first", duration: 3.0, position: .bottom)
+            
+//            Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Select image first", withError: nil, onClose: {
+//                return
+//            })
         }
         
     }
     
+   
+    
     @IBAction func onpressedVideoUploadBtn(_ sender: Any)
     {
-        if self.VideoUrl != nil {
-            if self.videoTitleTF.text != ""{
-                self.uploadSelfHelpVideo()
+        if self.uploadVideoBtn.titleLabel?.text == "Submit" {
+         //   if self.videoTitleTF.text != ""{
+                if !(videoTitleTF.text?.trimmingCharacters(in: .whitespaces).isEmpty)! {
+                            // string contains non-whitespace characters
+                            print("text has no spaces")
+                            print(videoTitleTF.text ?? "")
+                    self.editvideoApi()
+
+                } else {
+                            print("text length",videoTitleTF.text?.count ?? 0)
+                            print("text has spaces")
+                            self.view.makeToast("Please add a title", duration: 3.0, position: .bottom
+                            )
+                        return
+                        }
+          //  }
+//            else{
+//        self.view.makeToast("Please add a title", duration: 3.0, position: .bottom)
+////                Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please add a title", withError: nil, onClose: {
+////                    return
+////                })
+//            }
+            
+        }else if self.uploadVideoBtn.titleLabel?.text == "Upload Video"{
+            if self.VideoUrl != nil {
+                if self.videoTitleTF.text != ""{
+                    self.uploadSelfHelpVideo()
+                }
+                else{
+                    self.view.makeToast("Please add a title.", duration: 3.0, position: .bottom)
+//                    Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please add a title", withError: nil, onClose: {
+//                        return
+//                    })
+                }
+               
             }
             else{
-                self.view.makeToast("Please add a title.", duration: 3.0, position: .top)
+                    
+               self.view.makeToast("Select video first", duration: 3.0, position: .bottom)
+//                Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Select video first", withError: nil, onClose: {
+//                    return
+//                })
             }
             
         }
-        else{
-            self.view.makeToast("Select video first", duration: 3.0, position: .top)
-        }
+
     } 
     
     
     @IBAction func onpresssedSearchBtn(_ sender: Any)
     {
-        let vc = UIStoryboard.init(name: "Main", bundle:Bundle.main).instantiateViewController(withIdentifier: "SerachingVC") as? SerachingVC
-        self.navigationController?.pushViewController(vc!, animated: true)
+        self.searchBtn.isSelected = true
+        let onvc = UIStoryboard.init(name: "Main", bundle:Bundle.main).instantiateViewController(withIdentifier: "SerachingVC") as? SerachingVC
+       // onvc?.isSerach = "UserBenifit"
+        onvc?.delegate2 = self
+        self.present(onvc!, animated: true, completion: nil)
+        self.zicodeUIView.isHidden = false
+      //  self.navigationController?.pushViewController(vc!, animated: true)
+        
+        
+        
+        
     }
-    
-    
+        
     @IBAction func onPressedUploadVideobtn2(_ sender: Any)
     {
         videoUploadCollectionView.isHidden = false
@@ -1048,35 +1841,43 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
     @IBAction func onPressedUploadVideoBtn(_ sender: Any)
     {
         videoUploadCollectionView.isHidden = true
-        self.uploadVideoNoVideoView1.isHidden = true
+        self.uploadVideoNoVideoView1.isHidden = false
         self.uploadVideoView2.isHidden = false
+        self.uploadDrivingLicenseBtn.isHidden = true
+        videouploadBtn.isHidden = false
+        uploadVideoBtn.isHidden = false
+        
         
         if self.VideoUrl != nil{
             if self.videoTitleTF.text != ""{
                 self.uploadSelfHelpVideo()
             }
             else{
-                self.view.makeToast("Please add a title.", duration: 3.0, position: .top)
+                self.view.makeToast("Please add a title.", duration: 3.0, position: .bottom)
             }
         }
         else{
-            self.view.makeToast("Select video first", duration: 3.0, position: .top)
+            self.view.makeToast("Select video first", duration: 3.0, position: .bottom)
         }
     }
     
     @IBAction func onpressedSaveBtn(_ sender: Any)
     {
-        self.VehicalregistrationAddMoreView.isHidden = false
+      //  self.VehicalregistrationAddMoreView.isHidden = false
 //        self.atteorneysTable.isHidden = true
         self.SosBtn.isHidden = true
         if buttonName == "Vehicle Registration"{
             self.addMoreButton.isHidden = false
-            self.Savebtn.isHidden = true
+           // self.addMoreButton.isHidden = true
+            self.Savebtn.isHidden = false
             updateRegisteredVehicles()
+            
+          //  self.addMoreButton.isHidden = false
+
         }
         else if buttonName == "Vehicle Insurance"{
             self.addMoreButton.isHidden = false
-            self.Savebtn.isHidden = true
+            self.Savebtn.isHidden = false
             updateVehicleInsurance()
         }
         else if buttonName == "My Connections"{
@@ -1086,7 +1887,22 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
     
     @IBAction func onPressedBackarrowBtn(_ sender: Any)
     {
-        self.navigationController?.popViewController(animated: true)
+
+        if searchBtn.isSelected == true {
+            print("SELECTED",searchBtn.isSelected)
+            if (delegatez != nil) {
+                let information : String = self.userzipcodeLbl.text ?? ""
+                print("hhhhhh",information)
+                print("iiiiii",self.userzipcodeLbl.text)
+                delegatez?.userSelectedValue12(info: information)
+                print("jjjjj",information)
+            }
+        }else{
+            print("SELECTED1",searchBtn.isSelected)
+        }
+        
+        self.dismiss(animated: true)
+        
     }
     
     func reginib()
@@ -1126,7 +1942,6 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                 else{
                     return buttonNAmeArray.count
                 }
-            
             }
             else if  collectionView == self.videosCOllection{
                 return self.videosList.count
@@ -1148,17 +1963,146 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                 self.nameTitle = buttonNAmeArray[indexPath.row]
             }
             cell.shopLiftingBtn.setTitle(self.nameTitle, for: .normal)
-            if indexpath != nil && indexPath == indexpath {
+            
+            if   self.selecteditem == indexPath.row  {
                 cell.shopLiftingBtn.backgroundColor = UIColor.blue
-            }else{
-                cell.shopLiftingBtn.backgroundColor = UIColor.gray
-            }
+            // self.feedDatacollectionView.isHidden = false
+            }else {
+             cell.shopLiftingBtn.backgroundColor = UIColor.gray
+         }
+//            if indexPath.row == 0 {
+//                cell.shopLiftingBtn.isSelected = true
+//                cell.shopLiftingBtn.backgroundColor = UIColor.red
+//                self.atteorneysTable.isHidden = false
+//               // uploadSelfHelpVideo()
+//
+//
+//            }else{
+//                cell.shopLiftingBtn.isSelected = false
+//                cell.shopLiftingBtn.backgroundColor = UIColor.black
+//
+//
+//            }
+//
+//            if indexpath != nil && indexPath == indexpath {
+//                cell.shopLiftingBtn.backgroundColor = UIColor.blue
+//            }else{
+//                cell.shopLiftingBtn.backgroundColor = UIColor.gray
+//            }
              return cell
        }
         else if collectionView == self.videosCOllection{
+
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "selfHelpVideosCell", for: indexPath) as! selfHelpVideosCell
+           // DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
+            cell.editImg.isHidden = true
+           // })
+            
              let data = self.videosList[indexPath.row].dictionaryValue
-             cell.videotitleLbl.text = data["title"]?.stringValue
+            cell.videotitleLbl.text = data["title"]?.stringValue
+            let newuimg = data["url"]?.stringValue
+            print("newimage",newuimg)
+            cell.editBtn.setTitle("", for: .normal)
+            var image = data["thumbnail"]?.stringValue
+            self.newURL = URL(string: image!)
+            cell.videoThumbnail.kf.setImage(with: self.newURL)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
+            cell.editImg.isHidden = false
+            })
+            cell.editBtn1 = {
+                self.getvideoid =  data["video_id"]?.intValue
+                print("GETVIDEOIDSTR",self.getvideoid)
+                self.editlistArray.append(JSON(rawValue: self.getvideoid!) ?? "")
+                print("EDITLIST",self.editlistArray)
+                self.imagestr = data["thumbnail"]?.stringValue
+                print("VIDEOIDImageSTR",self.imagestr)
+                self.newURL = URL(string: self.imagestr!)
+                self.imgListArr.append(JSON(rawValue: self.newURL!) ?? "")
+                print("Imagelist",self.imgListArr)
+                self.uploadVideoLbl.isHidden =  true
+                self.uploadVideoIcon.isHidden = true
+                self.openVideoGalleryBttn.isHidden = true
+//                self.videouploadBtn.isSelected = false
+              //  self.openVideoGalleryBttn.setImage(UIImage(named: image!), for: .normal)
+                self.uploadVideoBGImageView.sd_setImage(with: self.newURL)
+                self.uploadVideoNoVideoView1.isHidden = true
+                self.uploadVideoView2.isHidden = false
+                self.uploadDrivingLicenseBtn.isHidden = true
+              //  self.videouploadBtn.isHidden = true
+                self.uploadVideoBtn.isHidden = false
+                self.uploadVideoBtn.setTitle("Submit", for: .normal)
+                self.atteorneysTable.isHidden = true
+                self.addVideosButton.isHidden = true
+                self.videosCOllection.isHidden = true
+                
+                self.videoTitleTF.text = cell.videotitleLbl.text
+                self.videosList.removeAll()
+                self.videosCOllection.reloadData()
+            }
+
+//            if self.newURL == nil {
+//                print("nNOIMAGEil")
+//            }else{
+//                cell.videoThumbnail.kf.setImage(with: self.newURL)
+//
+//
+//            }
+//
+//            if (self.newImg == nil){
+//                print("jjjjjjjjGGGGG")
+//            }else{
+//                self.base64Str = convertImageToBase64(image: self.newImg!)
+//                print("IMAGE base64 String: \(self.base64Str)")
+//              //  self.activityIndicator.startAnimating()
+//
+//                if let decodeData = Data(base64Encoded: self.base64Str, options: .ignoreUnknownCharacters) {
+//                    print("DECODE",decodeData)
+//                    self.uploadImg =  UIImage(data: decodeData)
+//                    cell.editImg.isHidden = false
+//                    NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+//                    print("IMAGESHOW",self.uploadImg?.pngData())
+//                   // self.uploadVideoImageApi()
+//                }
+//
+//
+//
+//              //  let decodedString = String(data: decodedData!, encoding: .utf8)!
+//    //  print("STRINGIMG",decodedString)
+//
+//            }
+         //   self.activityIndicator.startAnimating()
+
+//            self.getThumbnailImageFromVideoUrl(url: url1!) { (thumbImage) in
+//                print("thumbnail",thumbImage)
+//              //  cell.videoThumbnail.sd_setImage(with: thumbImage)
+//
+//                cell.videoThumbnail.image = thumbImage
+//              //  cell.editImg.isHidden = false
+//
+//                if (thumbImage == nil){
+//                    print("jjjjjjjjGGGGG")
+//                }else{
+//                    self.base64Str = convertImageToBase64(image: thumbImage!)
+//                    print("IMAGE base64 String: \(self.base64Str)")
+//                  //  self.activityIndicator.startAnimating()
+//
+//                    if let decodeData = Data(base64Encoded: self.base64Str, options: .ignoreUnknownCharacters) {
+//                        print("DECODE",decodeData)
+//                        self.uploadImg =  UIImage(data: decodeData)
+//                        cell.editImg.isHidden = false
+//                        NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+//                        print("IMAGESHOW",self.uploadImg?.pngData())
+//                       // self.uploadVideoImageApi()
+//                    }
+//
+//
+//
+//                  //  let decodedString = String(data: decodedData!, encoding: .utf8)!
+//     //  print("STRINGIMG",decodedString)
+//
+//                }
+//            }
+        
             return cell
         }
         else
@@ -1182,9 +2126,9 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
             self.present(playerViewController, animated: true) {
                 playerViewController.player!.play()
             }
+          
         }
     }
-    
     
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize
@@ -1241,195 +2185,376 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
     
     
      func onpressedShopliftingBtn(cell:Tabcollectioncell){
-            if cell.shopLiftingBtn.backgroundColor == UIColor.gray
-            {
-                if cell.shopLiftingBtn.titleLabel?.text == "Vehicle Registration"
-                {
-                    self.getRegisteredVehicles()
-                    self.trackerButtonView.isHidden = true
-                    buttonName = cell.shopLiftingBtn.titleLabel!.text!
-                     Savebtn.isHidden = false
-                    self.addVideosButton.isHidden = true
-                    self.videosCOllection.isHidden = true
-                    self.VehicalregistrationAddMoreView.isHidden = true
-                    self.DrivinglicenseUploadView.isHidden = true
-                    self.VehicalregistrationAddMoreView.isHidden = true
-                    self.uploadVideoNoVideoView1.isHidden = true
-                    self.uploadVideoView2.isHidden = true
-                    self.addMoreButton.setTitle("Add More", for: .normal)
-                    
-                    videoUploadCollectionView.isHidden = true
-                    SosBtn.isHidden = true
-                }
-                else if cell.shopLiftingBtn.titleLabel?.text == "My Connections"{
-                    self.getConnectionList()
-                    self.trackerButtonView.isHidden = true
-                    self.drivingLicenseImg = UIImage(named: "bitmap-2")
-                    buttonName = cell.shopLiftingBtn.titleLabel!.text!
-                    self.atteorneysTable.isHidden = false
-                    self.addVideosButton.isHidden = true
-                    self.videosCOllection.isHidden = true
-                    self.atteorneysTable.reloadData()
-                    self.VehicalregistrationAddMoreView.isHidden = true
-                    self.selfVideoCollecionView.isHidden = true
-                    self.DrivinglicenseUploadView.isHidden = true
-                    selfVideoCollecionView.isHidden = true
-                    self.uploadVideoView2.isHidden = true
-                    self.VehicalregistrationAddMoreView.isHidden = true
-                    self.DrivinglicenseUploadView.isHidden = true
-                    self.VehicalregistrationAddMoreView.isHidden = true
-                    self.uploadVideoNoVideoView1.isHidden = true
-                    Savebtn.isHidden = true
-                    SosBtn.isHidden = true
-                    self.addMoreButton.isHidden = false
-                    self.addMoreButton.setTitle("Add New", for: .normal)
-                }
-                    else if cell.shopLiftingBtn.titleLabel?.text == "Tracker"{
-                        self.getTrackerLists()
-                    self.trackerButtonView.isHidden = false
-                    self.trackerList.removeAll()
-                    self.buttonName = cell.shopLiftingBtn.titleLabel!.text!
-                    self.atteorneysTable.isHidden = false
-                    self.addVideosButton.isHidden = true
-                    self.videosCOllection.isHidden = true
-                    self.atteorneysTable.reloadData()
-                    self.VehicalregistrationAddMoreView.isHidden = true
-                    self.selfVideoCollecionView.isHidden = true
-                    self.DrivinglicenseUploadView.isHidden = true
-                    selfVideoCollecionView.isHidden = true
-                    self.uploadVideoView2.isHidden = true
-                    self.VehicalregistrationAddMoreView.isHidden = true
-                    self.DrivinglicenseUploadView.isHidden = true
-                    self.VehicalregistrationAddMoreView.isHidden = true
-                    self.uploadVideoNoVideoView1.isHidden = true
-                    Savebtn.isHidden = true
-                    SosBtn.isHidden = true
-            }
-            else if cell.shopLiftingBtn.titleLabel?.text == "Attorneys"
-            {
-                self.getAttorneyList()
-                self.trackerButtonView.isHidden = true
-                buttonName = cell.shopLiftingBtn.titleLabel!.text!
-                self.atteorneysTable.isHidden = false
-                self.addVideosButton.isHidden = true
-                self.videosCOllection.isHidden = true
-                self.atteorneysTable.reloadData()
-                self.VehicalregistrationAddMoreView.isHidden = true
-                self.selfVideoCollecionView.isHidden = true
-                self.DrivinglicenseUploadView.isHidden = true
-                selfVideoCollecionView.isHidden = true
-                self.uploadVideoView2.isHidden = true
-                self.VehicalregistrationAddMoreView.isHidden = true
-                self.DrivinglicenseUploadView.isHidden = true
-                self.VehicalregistrationAddMoreView.isHidden = true
-                self.uploadVideoNoVideoView1.isHidden = true
-                Savebtn.isHidden = true
-                                
-            }
-            else if cell.shopLiftingBtn.titleLabel?.text == "Bail Bonds"
-                    {
-                        self.getBailBondList()
-                        self.trackerButtonView.isHidden = true
-                        buttonName = cell.shopLiftingBtn.titleLabel!.text!
-                        self.videosCOllection.isHidden = true
-                        self.atteorneysTable.isHidden = false
-                        self.addVideosButton.isHidden = true
-                        self.atteorneysTable.reloadData()
-                        self.VehicalregistrationAddMoreView.isHidden = true
-                        self.selfVideoCollecionView.isHidden = true
-                        self.DrivinglicenseUploadView.isHidden = true
-                        selfVideoCollecionView.isHidden = true
-                        self.uploadVideoView2.isHidden = true
-                        self.VehicalregistrationAddMoreView.isHidden = true
-                        self.DrivinglicenseUploadView.isHidden = true
-                        self.VehicalregistrationAddMoreView.isHidden = true
-                        self.uploadVideoNoVideoView1.isHidden = true
-                        Savebtn.isHidden = true
-                }
-                else if cell.shopLiftingBtn.titleLabel?.text == "Self Help Videos"
-                {
-                    self.getVideosList()
-                    self.trackerButtonView.isHidden = true
-                    buttonName = cell.shopLiftingBtn.titleLabel!.text!
-                    self.atteorneysTable.isHidden = true
-                    self.uploadVideoLbl.text = "Browse and Upload Self Help Video"
-                    self.videoTitleTF.placeholder = "Video Title"
-                    self.VehicalregistrationAddMoreView.isHidden = true
-                    self.uploadDrivingLicenseBtn.isHidden = true
-                    self.uploadVideoNoVideoView1.isHidden = true
-                    self.uploadVideoBtn.isHidden = true
-                    self.SosBtn.isHidden = true
-                    
-                }
-                else if cell.shopLiftingBtn.titleLabel?.text == "Vehicle Insurance"
-                {
-                    self.videosCOllection.isHidden = true
-                    self.trackerButtonView.isHidden = true
-                    self.buttonName = cell.shopLiftingBtn.titleLabel!.text!
-                    self.atteorneysTable.isHidden = false
-                    self.uploadVideoView2.isHidden = true
-                    self.uploadDrivingLicenseBtn.isHidden = true
-                    self.addVideosButton.isHidden = true
-                    self.Savebtn.isHidden = false
-                    self.atteorneysTable.reloadData()
-                    self.VehicalregistrationAddMoreView.isHidden = true
-                    self.SosBtn.isHidden = true
-                    self.DrivinglicenseUploadView.isHidden = true
-                    self.addMoreButton.setTitle("Add More", for: .normal)
-                    SosBtn.isHidden = true
-                    self.getinsuredVehicles()
-                }
-                else if cell.shopLiftingBtn.titleLabel?.text == "Driver License"
-                {
-                    self.videosCOllection.isHidden = true
-                    self.trackerButtonView.isHidden = true
-                    self.uploadVideoLbl.text = "Browse and Upload Your Driving License"
-                    self.videoTitleTF.placeholder = "Image Name"
-                    self.drivingLicenseImg = nil
-                    self.videoTitleTF.text = nil
-                    self.uploadVideoIcon.isHidden = false
-                    self.uploadVideoLbl.isHidden = false
-                    self.uploadVideoBGImageView.image = UIImage(named: "myaacounbckgroundt2img")
-                    buttonName = cell.shopLiftingBtn.titleLabel!.text!
-                    self.addVideosButton.isHidden = true
-//                    self.uploadVideoView2.isHidden = false
-                    self.uploadVideoView2.isHidden = true
-                    self.uploadVideoBtn.isHidden =  true
-                    self.DrivinglicenseUploadView.isHidden = true
-                    self.uploadVideoBtn.isHidden = true
-                    self.uploadDrivingLicenseBtn.isHidden = true
-                    selfVideoCollecionView.isHidden = true
-                    VehicalregistrationAddMoreView.isHidden = true
-                    self.atteorneysTable.isHidden = true
-                    self.addMoreButton.setTitle("Add More", for: .normal)
-                    SosBtn.isHidden = true
-                    self.getDrivingLicenseList()
-                }
-            }
-            else
-            {
-                self.videosCOllection.isHidden = true
-                SosBtn.isHidden = true
-                self.trackerButtonView.isHidden = true
-                selfVideoCollecionView.isHidden = true
-                self.addVideosButton.isHidden = true
-                VehicalregistrationAddMoreView.isHidden = true
-                self.DrivinglicenseUploadView.isHidden = true
-                self.atteorneysTable.isHidden = true
-                Savebtn.isHidden = true
-                self.uploadVideoNoVideoView1.isHidden = true
-                self.addMoreButton.setTitle("Add More", for: .normal)
-                self.uploadVideoView2.isHidden = true
-                VehicalregistrationAddMoreView.isHidden = true
-            }
-            if cell.shopLiftingBtn.backgroundColor == .gray{
-                self.indexpath = self.buttonCollection.indexPath(for: cell)
-                self.buttonCollection.reloadData()
-            }
-            else{
-                self.indexpath = nil
-                self.buttonCollection.reloadData()
-            }
+         
+         let indexpath = self.buttonCollection.indexPath(for: cell)
+         self.selecteditem = indexpath?.row ?? 0
+         
+         DispatchQueue.main.async {
+             self.buttonCollection.reloadData()
+         }
+         
+         if selecteditem == 0 {
+             zicodeUIView.isHidden =  true
+
+             self.newLbl.isHidden = true
+             lineView.isHidden = false
+             self.getVideosList()
+             self.atteorneysTable.isHidden = true
+
+                                self.sosbutnoutlet.isHidden = true
+
+                                self.trackerButtonView.isHidden = true
+                                buttonName = cell.shopLiftingBtn.titleLabel!.text!
+
+                                self.uploadVideoLbl.text = "Browse and Upload Self Help Video"
+                                self.videoTitleTF.placeholder = "Video Title"
+                                self.VehicalregistrationAddMoreView.isHidden = true
+                                self.uploadDrivingLicenseBtn.isHidden = true
+                                self.uploadVideoNoVideoView1.isHidden = true
+                                self.uploadVideoBtn.isHidden = true
+                                self.SosBtn.isHidden = true
+                                self.sosbutnoutlet.isHidden = true
+                               plusimage.isHidden = false
+
+         }
+         
+         if selecteditem == 1 {
+             zicodeUIView.isHidden =  false
+             lineView.isHidden = true
+             self.videosCOllection.isHidden = true
+             cell.shopLiftingBtn.titleLabel?.text = "Attorneys"
+            self.getAttorneyList()
+
+                             self.trackerButtonView.isHidden = true
+                             buttonName = cell.shopLiftingBtn.titleLabel!.text!
+                             self.atteorneysTable.isHidden = false
+                             self.addVideosButton.isHidden = true
+                             self.videosCOllection.isHidden = true
+                             self.atteorneysTable.reloadData()
+                             self.VehicalregistrationAddMoreView.isHidden = true
+                             self.selfVideoCollecionView.isHidden = true
+                             self.DrivinglicenseUploadView.isHidden = true
+                             self.uploadVideoView2.isHidden = true
+                             self.uploadVideoNoVideoView1.isHidden = true
+                             Savebtn.isHidden = true
+                             sosbutnoutlet.isHidden = false
+                             plusimage.isHidden = true
+         }
+         
+         if selecteditem == 2 {
+             zicodeUIView.isHidden =  false
+             lineView.isHidden = true
+             self.getBailBondList()
+                                     self.trackerButtonView.isHidden = true
+                                     buttonName = cell.shopLiftingBtn.titleLabel!.text!
+                                     self.videosCOllection.isHidden = true
+                                     self.atteorneysTable.isHidden = true
+                                     self.addVideosButton.isHidden = true
+                                     self.atteorneysTable.reloadData()
+                                     self.VehicalregistrationAddMoreView.isHidden = true
+                                     self.selfVideoCollecionView.isHidden = true
+                                     self.DrivinglicenseUploadView.isHidden = true
+                                     self.uploadVideoView2.isHidden = true
+                                     self.VehicalregistrationAddMoreView.isHidden = true
+                                     self.VehicalregistrationAddMoreView.isHidden = true
+                                     self.uploadVideoNoVideoView1.isHidden = true
+             
+                                     Savebtn.isHidden = true
+                                     sosbutnoutlet.isHidden = false
+                                     plusimage.isHidden = true
+                                     zicodeUIView.isHidden =  false
+         }
+         if selecteditem == 3 {
+             self.newLbl.isHidden = true
+             zicodeUIView.isHidden =  true
+             lineView.isHidden = false
+
+                                 self.trackerButtonView.isHidden = true
+                                 buttonName = cell.shopLiftingBtn.titleLabel!.text!
+                                 self.Savebtn.isHidden = false
+                                 self.addVideosButton.isHidden = true
+                                 self.videosCOllection.isHidden = true
+                                 self.VehicalregistrationAddMoreView.isHidden = true
+                                 self.DrivinglicenseUploadView.isHidden = true
+                                 self.VehicalregistrationAddMoreView.isHidden = true
+                                 self.uploadVideoNoVideoView1.isHidden = true
+                                 self.uploadVideoView2.isHidden = true
+                                  self.addMoreButton.setTitle("Add More", for: .normal)
+             
+                                 videoUploadCollectionView.isHidden = true
+                                 SosBtn.isHidden = true
+                                 sosbutnoutlet.isHidden = true
+                                  plusimage.isHidden = true
+             self.addMoreButton.isHidden = true
+             self.getRegisteredVehicles()
+             self.addMoreButton.isHidden = false
+          //   zicodeUIView.isHidden =  true
+         }
+         
+         if selecteditem == 4 {
+             self.newLbl.isHidden = true
+
+             zicodeUIView.isHidden =  true
+             lineView.isHidden = false
+             self.videosCOllection.isHidden = true
+                                 self.trackerButtonView.isHidden = true
+                                 self.buttonName = cell.shopLiftingBtn.titleLabel!.text!
+                                 self.atteorneysTable.isHidden = false
+                                 self.uploadVideoView2.isHidden = true
+                                 self.uploadDrivingLicenseBtn.isHidden = true
+                                 self.addVideosButton.isHidden = true
+                                 self.Savebtn.isHidden = false
+                                 self.atteorneysTable.reloadData()
+                                 self.VehicalregistrationAddMoreView.isHidden = true
+                                 self.SosBtn.isHidden = true
+                                 self.DrivinglicenseUploadView.isHidden = true
+                                // self.addMoreButton.setTitle("Add More", for: .normal)
+                              self.addMoreButton.setTitle("Add More", for: .normal)
+
+                                 SosBtn.isHidden = true
+                                 sosbutnoutlet.isHidden = true
+             self.plusimage.isHidden = true
+             self.addMoreButton.isHidden = true
+                                 self.getinsuredVehicles()
+             self.addMoreButton.isHidden = false
+          // self.atteorneysTable.reloadData()
+         }
+         if selecteditem == 5 {
+             self.newLbl.isHidden = true
+
+             self.videosCOllection.isHidden = true
+
+             zicodeUIView.isHidden =  true
+             lineView.isHidden = false
+
+                                self.trackerButtonView.isHidden = true
+                                self.uploadVideoLbl.text = "Browse and Upload Your Driving License"
+                                self.videoTitleTF.placeholder = "Image Name"
+                                self.drivingLicenseImg = nil
+                                self.videoTitleTF.text = nil
+                                self.uploadVideoIcon.isHidden = false
+                                self.uploadVideoLbl.isHidden = false
+                                self.uploadVideoBGImageView.image = UIImage(named: "myaacounbckgroundt2img")
+                                buttonName = cell.shopLiftingBtn.titleLabel!.text!
+                                self.addVideosButton.isHidden = true
+            //                    self.uploadVideoView2.isHidden = false
+                                self.uploadVideoView2.isHidden = true
+                                self.uploadVideoBtn.isHidden =  true
+                                self.DrivinglicenseUploadView.isHidden = true
+                                self.uploadVideoBtn.isHidden = true
+                                self.uploadDrivingLicenseBtn.isHidden = true
+                                selfVideoCollecionView.isHidden = true
+                                VehicalregistrationAddMoreView.isHidden = true
+                                self.atteorneysTable.isHidden = true
+                                self.addMoreButton.setTitle("Add More", for: .normal)
+                                SosBtn.isHidden = true
+                                sosbutnoutlet.isHidden = false
+                               plusimage.isHidden = true
+
+                                self.getDrivingLicenseList()
+             
+                           //   self.atteorneysTable.reloadData()
+
+         }
+                 
+         
+//            if cell.shopLiftingBtn.backgroundColor == UIColor.gray
+//            {
+//                if cell.shopLiftingBtn.titleLabel?.text == "Vehicle Registration"
+//                {
+//                    self.getRegisteredVehicles()
+//                    self.trackerButtonView.isHidden = true
+//                    buttonName = cell.shopLiftingBtn.titleLabel!.text!
+//                     Savebtn.isHidden = false
+//                    self.addVideosButton.isHidden = true
+//                    self.videosCOllection.isHidden = true
+//                    self.VehicalregistrationAddMoreView.isHidden = true
+//                    self.DrivinglicenseUploadView.isHidden = true
+//                    self.VehicalregistrationAddMoreView.isHidden = true
+//                    self.uploadVideoNoVideoView1.isHidden = true
+//                    self.uploadVideoView2.isHidden = true
+//                    self.addMoreButton.setTitle("Add More", for: .normal)
+//
+//                    videoUploadCollectionView.isHidden = true
+//                    SosBtn.isHidden = true
+//                    sosbutnoutlet.isHidden = true
+//                }
+//                else if cell.shopLiftingBtn.titleLabel?.text == "My Connections"{
+//                    self.getConnectionList()
+//                    self.trackerButtonView.isHidden = true
+//                    self.drivingLicenseImg = UIImage(named: "bitmap-2")
+//                    buttonName = cell.shopLiftingBtn.titleLabel!.text!
+//                    self.atteorneysTable.isHidden = false
+//                    self.addVideosButton.isHidden = true
+//                    self.videosCOllection.isHidden = true
+//                    self.atteorneysTable.reloadData()
+//                    self.VehicalregistrationAddMoreView.isHidden = true
+//                    self.selfVideoCollecionView.isHidden = true
+//                    self.DrivinglicenseUploadView.isHidden = true
+//                    selfVideoCollecionView.isHidden = true
+//                    self.uploadVideoView2.isHidden = true
+//                    self.VehicalregistrationAddMoreView.isHidden = true
+//                    self.DrivinglicenseUploadView.isHidden = true
+//                    self.VehicalregistrationAddMoreView.isHidden = true
+//                    self.uploadVideoNoVideoView1.isHidden = true
+//                    Savebtn.isHidden = true
+//                    SosBtn.isHidden = true
+//                    self.addMoreButton.isHidden = false
+//                    self.addMoreButton.setTitle("Add New", for: .normal)
+//                }
+//                    else if cell.shopLiftingBtn.titleLabel?.text == "Tracker"{
+//                        self.getTrackerLists()
+//                    self.trackerButtonView.isHidden = false
+//                    self.trackerList.removeAll()
+//                    self.buttonName = cell.shopLiftingBtn.titleLabel!.text!
+//                    self.atteorneysTable.isHidden = false
+//                    self.addVideosButton.isHidden = true
+//                    self.videosCOllection.isHidden = true
+//                    self.atteorneysTable.reloadData()
+//                    self.VehicalregistrationAddMoreView.isHidden = true
+//                    self.selfVideoCollecionView.isHidden = true
+//                    self.DrivinglicenseUploadView.isHidden = true
+//                    selfVideoCollecionView.isHidden = true
+//                    self.uploadVideoView2.isHidden = true
+//                    self.VehicalregistrationAddMoreView.isHidden = true
+//                    self.DrivinglicenseUploadView.isHidden = true
+//                    self.VehicalregistrationAddMoreView.isHidden = true
+//                    self.uploadVideoNoVideoView1.isHidden = true
+//                    Savebtn.isHidden = true
+//                    SosBtn.isHidden = true
+//            }
+//            else if cell.shopLiftingBtn.titleLabel?.text == "Attorneys"
+//            {
+//                self.getAttorneyList()
+//                self.trackerButtonView.isHidden = true
+//                buttonName = cell.shopLiftingBtn.titleLabel!.text!
+//                self.atteorneysTable.isHidden = false
+//                self.addVideosButton.isHidden = true
+//                self.videosCOllection.isHidden = true
+//                self.atteorneysTable.reloadData()
+//                self.VehicalregistrationAddMoreView.isHidden = true
+//                self.selfVideoCollecionView.isHidden = true
+//                self.DrivinglicenseUploadView.isHidden = true
+//                selfVideoCollecionView.isHidden = true
+//                self.uploadVideoView2.isHidden = true
+//                self.VehicalregistrationAddMoreView.isHidden = true
+//                self.DrivinglicenseUploadView.isHidden = true
+//                self.VehicalregistrationAddMoreView.isHidden = true
+//                self.uploadVideoNoVideoView1.isHidden = true
+//                Savebtn.isHidden = true
+//                sosbutnoutlet.isHidden = false
+//
+//            }
+//            else if cell.shopLiftingBtn.titleLabel?.text == "Bail Bonds"
+//                    {
+//                        self.getBailBondList()
+//                        self.trackerButtonView.isHidden = true
+//                        buttonName = cell.shopLiftingBtn.titleLabel!.text!
+//                        self.videosCOllection.isHidden = true
+//                        self.atteorneysTable.isHidden = false
+//                        self.addVideosButton.isHidden = true
+//                        self.atteorneysTable.reloadData()
+//                        self.VehicalregistrationAddMoreView.isHidden = true
+//                        self.selfVideoCollecionView.isHidden = true
+//                        self.DrivinglicenseUploadView.isHidden = true
+//                        selfVideoCollecionView.isHidden = true
+//                        self.uploadVideoView2.isHidden = true
+//                        self.VehicalregistrationAddMoreView.isHidden = true
+//                        self.DrivinglicenseUploadView.isHidden = true
+//                        self.VehicalregistrationAddMoreView.isHidden = true
+//                        self.uploadVideoNoVideoView1.isHidden = true
+//                        Savebtn.isHidden = true
+//                sosbutnoutlet.isHidden = false
+//                }
+//                else if cell.shopLiftingBtn.titleLabel?.text == "Self Help Videos"
+//                {
+//                   // self.getVideosList()
+//                    self.sosbutnoutlet.isHidden = true
+//
+//                    self.trackerButtonView.isHidden = true
+//                    buttonName = cell.shopLiftingBtn.titleLabel!.text!
+//                    self.atteorneysTable.isHidden = true
+//                    self.uploadVideoLbl.text = "Browse and Upload Self Help Video"
+//                    self.videoTitleTF.placeholder = "Video Title"
+//                    self.VehicalregistrationAddMoreView.isHidden = true
+//                    self.uploadDrivingLicenseBtn.isHidden = true
+//                    self.uploadVideoNoVideoView1.isHidden = true
+//                    self.uploadVideoBtn.isHidden = true
+//                    self.SosBtn.isHidden = true
+//                    self.sosbutnoutlet.isHidden = true
+//
+//                }
+//                else if cell.shopLiftingBtn.titleLabel?.text == "Vehicle Insurance"
+//                {
+//                    self.videosCOllection.isHidden = true
+//                    self.trackerButtonView.isHidden = true
+//                    self.buttonName = cell.shopLiftingBtn.titleLabel!.text!
+//                    self.atteorneysTable.isHidden = false
+//                    self.uploadVideoView2.isHidden = true
+//                    self.uploadDrivingLicenseBtn.isHidden = true
+//                    self.addVideosButton.isHidden = true
+//                    self.Savebtn.isHidden = false
+//                    self.atteorneysTable.reloadData()
+//                    self.VehicalregistrationAddMoreView.isHidden = true
+//                    self.SosBtn.isHidden = true
+//                    self.DrivinglicenseUploadView.isHidden = true
+//                    self.addMoreButton.setTitle("Add More", for: .normal)
+//                    SosBtn.isHidden = true
+//                    sosbutnoutlet.isHidden = true
+//                    self.getinsuredVehicles()
+//                }
+//                else if cell.shopLiftingBtn.titleLabel?.text == "Driver License"
+//                {
+//                    self.videosCOllection.isHidden = true
+//                    self.trackerButtonView.isHidden = true
+//                    self.uploadVideoLbl.text = "Browse and Upload Your Driving License"
+//                    self.videoTitleTF.placeholder = "Image Name"
+//                    self.drivingLicenseImg = nil
+//                    self.videoTitleTF.text = nil
+//                    self.uploadVideoIcon.isHidden = false
+//                    self.uploadVideoLbl.isHidden = false
+//                    self.uploadVideoBGImageView.image = UIImage(named: "myaacounbckgroundt2img")
+//                    buttonName = cell.shopLiftingBtn.titleLabel!.text!
+//                    self.addVideosButton.isHidden = true
+////                    self.uploadVideoView2.isHidden = false
+//                    self.uploadVideoView2.isHidden = true
+//                    self.uploadVideoBtn.isHidden =  true
+//                    self.DrivinglicenseUploadView.isHidden = true
+//                    self.uploadVideoBtn.isHidden = true
+//                    self.uploadDrivingLicenseBtn.isHidden = true
+//                    selfVideoCollecionView.isHidden = true
+//                    VehicalregistrationAddMoreView.isHidden = true
+//                    self.atteorneysTable.isHidden = true
+//                    self.addMoreButton.setTitle("Add More", for: .normal)
+//                    SosBtn.isHidden = true
+//                    sosbutnoutlet.isHidden = false
+//                    self.getDrivingLicenseList()
+//                }
+//            }
+//            else
+//            {
+//                self.videosCOllection.isHidden = true
+//                SosBtn.isHidden = true
+//                self.trackerButtonView.isHidden = true
+//                selfVideoCollecionView.isHidden = true
+//                self.addVideosButton.isHidden = true
+//                VehicalregistrationAddMoreView.isHidden = true
+//                self.DrivinglicenseUploadView.isHidden = true
+//                self.atteorneysTable.isHidden = true
+//                Savebtn.isHidden = true
+//                self.uploadVideoNoVideoView1.isHidden = true
+//                self.addMoreButton.setTitle("Add More", for: .normal)
+//                self.uploadVideoView2.isHidden = true
+//                VehicalregistrationAddMoreView.isHidden = true
+//            }
+//            if cell.shopLiftingBtn.backgroundColor == .gray{
+//                self.indexpath = self.buttonCollection.indexPath(for: cell)
+//              //  self.buttonCollection.reloadData()
+//            }
+//            else{
+//                self.indexpath = nil
+//             //   self.buttonCollection.reloadData()
+//            }
     }
     
     // working with tableview
@@ -1441,7 +2566,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
               }
               else if buttonName == "Bail Bonds"
               {
-                  return atorneyList.count
+                  return bailBondList.count
               }
               else if buttonName == "My Connections"
               {
@@ -1485,6 +2610,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
             }
             else if buttonName == "Driver License"{
                 self.Savebtn.isHidden = true
+               // atteorneysTable.reloadData()
                 return drivingLicenseImage.count
             }
             return vehicleREgistrationArray.count
@@ -1495,35 +2621,38 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
 
            if buttonName == "Attorneys"
            {
+               print("BHAGYA1",buttonName)
         let cell = tableView.dequeueReusableCell(withIdentifier: "CommuntyReprsentativeTablecell", for: indexPath) as! CommuntyReprsentativeTablecell
-            
-            let data = self.atorneyList[indexPath.row].dictionaryValue
-            cell.policeNameLbl.text = data["name"]?.stringValue
-            cell.phoneNumberLbl.text = data["phone_number"]?.stringValue
-            cell.delegate = self
-           return cell
-            }
-            else if buttonName == "Bail Bonds"
+               
+                   let data = self.atorneyList[indexPath.row].dictionaryValue
+                   cell.policeNameLbl.text = data["name"]?.stringValue
+                   cell.phoneNumberLbl.text = data["phone_no"]?.stringValue
+                   cell.delegate = self
+               return cell
+
+            }else if buttonName == "Bail Bonds"
                {
+                print("BHAGYA2",self.buttonName)
+
             let cell = tableView.dequeueReusableCell(withIdentifier: "CommuntyReprsentativeTablecell", for: indexPath) as! CommuntyReprsentativeTablecell
                 
-                let data = self.atorneyList[indexPath.row].dictionaryValue
+                let data = self.bailBondList[indexPath.row].dictionaryValue
                 cell.policeNameLbl.text = data["name"]?.stringValue
-                cell.phoneNumberLbl.text = data["phone_number"]?.stringValue
+                cell.phoneNumberLbl.text = data["phone_no"]?.stringValue
                 cell.delegate = self
                return cell
                 }
             
             else if buttonName == "My Connections"
                {
-                
+                print("BHAGYA3",self.buttonName)
+
                     if myConnections.count == 0{
 //                        let cell = UITableViewCell()
 //                        return cell
                         
                         self.Savebtn.isHidden = false
-                        
-                        
+                                                
                         if indexPath.row == 0 {
                             let cell2 = tableView.dequeueReusableCell(withIdentifier: "profileImgCell", for: indexPath) as! profileImgCell
                             if self.drivingLicenseImg != nil{
@@ -1539,8 +2668,6 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                         }
                         else{
                             let cell1 = tableView.dequeueReusableCell(withIdentifier: "VehicalInsuranceCell", for: indexPath) as! VehicalInsuranceCell
-
-                                                   
                                                    
                                                    cell1.insuranceTextfd.tweePlaceholder =  self.connectionListArray[indexPath.row]
                                                    cell1.insuranceTextfd.placeholderColor =  .clear
@@ -1549,7 +2676,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                                    print(self.formValues[self.connectionListArray[indexPath.row]])
                                                    cell1.insuranceTextfd.text = self.formValues[self.connectionListArray[indexPath.row]]
                                                    cell1.insuranceTextfd.delegate = self
-                            return cell1
+                                                  return cell1
                         }
                     }
                     else{
@@ -1574,6 +2701,8 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                 }
            else if buttonName == "Vehicle Insurance"
             {
+               print("BHAGYA4",self.buttonName)
+
                 if self.insuredVehicles.count != 0{
                     self.VehicalregistrationAddMoreView.isHidden = false
                 let cell1 = tableView.dequeueReusableCell(withIdentifier: "RegisteredVehicleCell", for: indexPath) as! RegisteredVehicleCell
@@ -1581,9 +2710,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                 print(indexPath.row)
                 let data = self.insuredVehicles[indexPath.row].dictionaryValue
                                 print(data)
-                    
                     cell1.vehicleName.isHidden = true
-                    
                     cell1.modelLbl.text = self.vehicleInsuranceArray[0]
                     cell1.vehicleNumberLbl.text = self.vehicleInsuranceArray[1]
                     cell1.ModelYearLbl.text = self.vehicleInsuranceArray[2]
@@ -1622,20 +2749,76 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
             
             else if buttonName == "Driver License"
             {
+                print("BHAGYA5",self.buttonName)
+
+                let cell1 = tableView.dequeueReusableCell(withIdentifier: "drivingLicenceCell", for: indexPath) as! drivingLicenceCell
+                cell1.deleteBttn.isHidden = true
+                
+                if self.drivingLicenseImage.count < 3 {
+                    self.atteorneysTable.isScrollEnabled = false
+                }else{
+                    self.atteorneysTable.isScrollEnabled = true
+                }
+
+                let tappingImg : UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.tapImageSelectFullview))
+                cell1.licenseImageView.isUserInteractionEnabled = true
+                cell1.licenseImageView.addGestureRecognizer(tappingImg)
+                tappingImg.delegate = self
+                
+               
+                
                     if self.drivingLicenseImage.count != 0{
+                       
+                        let activityData = ActivityData()
+                        NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
                         self.VehicalregistrationAddMoreView.isHidden = true
-                    let cell1 = tableView.dequeueReusableCell(withIdentifier: "drivingLicenceCell", for: indexPath) as! drivingLicenceCell
+                    
                     print(self.drivingLicenseImage)
                     print(indexPath.row)
                         let data = self.drivingLicenseImage[indexPath.row].dictionaryValue
                                     print(data)
-                        let urlString = data["url"]!.stringValue.replacingOccurrences(of: " ", with: "%20")
+                        self.urlString = data["url"]!.stringValue.replacingOccurrences(of: " ", with: "%20")
+                        print("STRING",self.urlString)
+                        self.imgUrl = URL(string: self.urlString ?? "")!
                         
-                        let imgUrl = URL(string: urlString)!
+
+                       // cell1.licenseImageView.kf.setImage(with: imgUrl)
+                   // cell1.deleteBttn.setImage(UIImage(named: "del_icon"), for: .normal)
+
+
+//                        DispatchQueue.main.async {
+//                            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
+//                                NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+//
+//                            })
+//
+//                        }
                         
-                        cell1.licenseImageView.kf.setImage(with: imgUrl)
+                        if urlString != "" {
+                            DispatchQueue.main.async {
+                              //  DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: {
+
+                                cell1.licenseImageView.kf.setImage(with: self.imgUrl)
+                                
+                                NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+                                  DispatchQueue.main.asyncAfter(deadline: .now() + 2.0, execute: {
+                                      cell1.deleteBttn.isHidden = false
+
+                                      cell1.deleteBttn.setImage(UIImage(named: "message_copy-1"), for: .normal)
+                                })
+
+                            }
+//                            cell1.deleteBttn.isHidden = false
+//                            cell1.licenseImageView.kf.setImage(with: imgUrl)
+//                            cell1.deleteBttn.setImage(UIImage(named: "del_icon"), for: .normal)
+                        }else{
+                           // cell1.deleteBttn.isHidden =  true
+                         //   cell1.deleteBttn.setImage(UIImage(named: ""), for: .normal)
+
+                        }
+                                               
                         cell1.delegate = self
-                        
+
                     return cell1
                     }
                     else{
@@ -1651,7 +2834,6 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                 let data = self.trackerList[indexPath.row].dictionaryValue
                 cell.userNameLbl.text = data["name"]?.stringValue
                 cell.loactionLbl.text = data["location"]?.stringValue
-
             cell.dateLbl.text = data["at_date"]?.stringValue
             cell.timeLbl.text = data["at_time"]?.stringValue
             let imgURL = URL(string: data["profile_pic"]?.stringValue ?? "")
@@ -1661,8 +2843,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
            else
            {
             print(self.registeredVehicles.count)
-            
-            if self.registeredVehicles.count != 0{
+                if self.registeredVehicles.count != 0{
                 self.VehicalregistrationAddMoreView.isHidden = false
                 let cell1 = tableView.dequeueReusableCell(withIdentifier: "RegisteredVehicleCell", for: indexPath) as! RegisteredVehicleCell
                                     print(self.registeredVehicles)
@@ -1677,8 +2858,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                 cell1.ModelYearLbl.text = self.vehicleREgistrationArray[3]
                 cell1.RegNumberLbl.text = self.vehicleREgistrationArray[4]
                 cell1.VINnumberLbl.text = self.vehicleREgistrationArray[5]
-                cell1.LicencePlatLbl.text = self.vehicleREgistrationArray[6]
-                
+              cell1.LicencePlatLbl.text = self.vehicleREgistrationArray[6]
                 cell1.vehicleName.text = data["vehicle_name"]?.stringValue
                 
                 cell1.vehicleModel.text = data["model_number"]?.stringValue
@@ -1786,9 +2966,12 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
             alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
                 let indexpath1 = self.atteorneysTable.indexPath(for: cell)
                             let insurance = self.registeredVehicles[indexpath1!.row].stringValue
+                
+                let userid : String =  UserDefaults.standard.object(forKey: "userid") as! String ?? "0"
+                
                 //            let insuranceId = ins
                             let parameter:[String:String] = [
-                                        "user_id": UserData._id,
+                                        "user_id": userid,
                                         "vehicle_id":self.registeredVehicles[indexpath1!.row]["vehicle_id"].stringValue
                                     ]
 
@@ -1802,7 +2985,10 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                         NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                                         if json["status"].stringValue == "200" {
                                             NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
-                                            self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .top)
+                                            self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .bottom)
+//                                            Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
+//                                                return
+//                                            })
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
                                                 self.atteorneysTable.isHidden = true
                                                 self.getRegisteredVehicles()
@@ -1820,26 +3006,21 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
             }))
 
             self.present(alert, animated: true)
-            
-            
-            
-            
-                    
-                    
-                }
+        }
         else if self.buttonName == "Vehicle Insurance"{
             
-            
-            let alert = UIAlertController(title: "Remove this vehicle", message: "Are you sure to remove this vehicle from insured vehicle list.", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Remove this vehicle", message: "Are you sure to remove this vehicle from insured vehicle list.", preferredStyle: .alert)
 
-            
-             alert.addAction(UIAlertAction(title: "No", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "No", style: .cancel, handler: nil))
              alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
                     let indexpath1 = self.atteorneysTable.indexPath(for: cell)
                                 let insurance = self.insuredVehicles[indexpath1!.row].stringValue
                     //            let insuranceId = ins
+                 
+                 
+                 let userid : String =  UserDefaults.standard.object(forKey: "userid") as! String ?? "0"
                                 let parameter:[String:String] = [
-                                            "user_id": UserData._id,
+                                            "user_id": userid,
                                             "insurance_id":self.insuredVehicles[indexpath1!.row]["insurance_id"].stringValue
                                         ]
 
@@ -1853,15 +3034,17 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                             NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                                             if json["status"].stringValue == "200" {
                                                 NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
-                                                self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .top)
+                                                self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .bottom)
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
                                                     self.atteorneysTable.isHidden = true
                                                     self.getinsuredVehicles()
                                                 })
                                             }else {
-                                                Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
-                                                    return
-                                                })
+                                                
+                                                self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .bottom)
+//                                                Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
+//                                                    return
+//                                                })
 
                                 //                let banner = NotificationBanner(title: "Alert", subtitle: json["msg"].stringValue , style: .danger)
                                 //                banner.show(queuePosition: .front)
@@ -1876,8 +3059,10 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                 }
     }
     
+    
     func deleteBttnTapped(cell: drivingLicenceCell) {
-        
+        let userid : String =  UserDefaults.standard.object(forKey: "userid") as! String ?? "0"
+
         let alert = UIAlertController(title: "Remove Driving License", message: "Are you sure to remove this driving license.", preferredStyle: .alert)
 
         
@@ -1885,9 +3070,10 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
          alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { action in
             let indexpath1 = self.atteorneysTable.indexPath(for: cell)
             let insurance = self.drivingLicenseImage[indexpath1!.row].stringValue
+             
             //            let insuranceId = ins
                         let parameter:[String:String] = [
-                                    "user_id": UserData._id,
+                                    "user_id": self.userid,
                                     "license_id":self.drivingLicenseImage[indexpath1!.row]["license_id"].stringValue
                                 ]
 
@@ -1901,11 +3087,16 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                     NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                                     if json["status"].stringValue == "200" {
                                         NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
-                                        self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .top)
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
+                                        self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .bottom)
+//                                        Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
+//                                            return
+//                                        })
+                                       // DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
                                             self.atteorneysTable.isHidden = true
                                             self.getDrivingLicenseList()
-                                        })
+                                            self.atteorneysTable.reloadData()
+
+                                       // })
                                     }else {
                                         Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
                                             return
@@ -1919,8 +3110,6 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
         }))
         
         self.present(alert, animated: true)
-        
-        
     }
     
     
@@ -1944,12 +3133,14 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
     func callbtnTapped(cell: CommuntyReprsentativeTablecell) {
         if self.buttonName != "My Connections"{
             let indexPath = self.atteorneysTable.indexPath(for: cell)
-            let number = self.atorneyList[indexPath!.row]["phone_number"].stringValue
+            let number = self.atorneyList[indexPath!.row]["phone_no"].stringValue
+            print("NUMBERCHECK",number)
             self.dialNumber(number: number)
         }
         else{
             let indexPath = self.atteorneysTable.indexPath(for: cell)
-            let number = self.myConnections[indexPath!.row]["phone_number"].stringValue
+            let number = self.myConnections[indexPath!.row]["phone_no"].stringValue
+            print("NUMBERConnection",number)
             self.dialNumber(number: number)
         }
         
@@ -1959,7 +3150,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
         
         if self.buttonName != "My Connections"{
             let indexPath = self.atteorneysTable.indexPath(for: cell)
-            let number = self.atorneyList[indexPath!.row]["phone_number"].stringValue
+            let number = self.atorneyList[indexPath!.row]["name"].stringValue
             let messageVC = MFMessageComposeViewController()
             messageVC.body = "Enter a message details here";
             messageVC.recipients = [number]
@@ -2007,8 +3198,8 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
                                 print(json)
                                 NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                                 if json["status"].stringValue == "200" {
-                                    NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
-                                    self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .top)
+                                NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+                                    self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .bottom)
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
                                         self.atteorneysTable.isHidden = true
                                         self.myConnections.removeAll()
@@ -2047,6 +3238,7 @@ class UserBenifitVC: UIViewController,UICollectionViewDelegate,UICollectionViewD
     
     func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult) {
         switch (result) {
+            
         case .cancelled:
             print("Message was cancelled")
         case .failed:
@@ -2080,9 +3272,11 @@ extension UserBenifitVC: UITextFieldDelegate{
                 
                 if Int(textField.text!)! > 1900 && Int(textField.text!)! <= year{
                     self.formValues["Model Year"] = textField.text!
-                }
-                else{
-                    self.view.makeToast("Please enter a valid year.", duration: 3.0, position: .top)
+                }else{
+                    self.view.makeToast("Please enter a valid year.", duration: 3.0, position: .bottom)
+//                    Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: "Please enter a valid year", withError: nil, onClose: {
+//                        return
+//                    })
                 }
             }
         }
@@ -2108,9 +3302,9 @@ extension UserBenifitVC: UITextFieldDelegate{
             self.formValues["Policy Number"] = textField.text!
         }
         else if textField.placeholder! == "Liability Coverage"{
-            self.formValues["Liability Coverage "] = textField.text!
+            self.formValues["Liability Coverage"] = textField.text!
         }
-        else if textField.placeholder! == "Comp and Collission"{
+        else if textField.placeholder! == "Comp and Collission Coverage"{
             self.formValues["Comp and Collission Coverage"] = textField.text!
         }
         else if textField.placeholder! == "Name"{
@@ -2171,19 +3365,21 @@ extension UserBenifitVC: UITextFieldDelegate{
                  return true
             }
             else{
-                self.view.makeToast("Please select start date first.", duration: 3.0, position: .top)
+                self.view.makeToast("Please select start date first.", duration: 3.0, position: .bottom)
                 return false
             }
+             
          }
-         else if textField.placeholder! == "Policy Number"{
-            textField.keyboardType = .asciiCapable
-             return true
-         }
+         
          else if textField.placeholder! == "Liability Coverage"{
             textField.keyboardType = .numberPad
              return true
          }
-         else if textField.placeholder! == "Comp and Collission"{
+      else  if textField.placeholder! == "Policy Number"{
+          textField.keyboardType = .alphabet
+           return true
+       }
+         else if textField.placeholder! == "Comp and Collission Coverage"{
              textField.keyboardType = .numberPad
              return true
          }
@@ -2193,6 +3389,7 @@ extension UserBenifitVC: UITextFieldDelegate{
             }
             else if textField.placeholder! == "Mobile Number"{
                 textField.keyboardType = .numberPad
+                
                 return true
             }
             else if textField.placeholder! == "Email"{
@@ -2209,6 +3406,11 @@ extension UserBenifitVC: UITextFieldDelegate{
     }
 }
 
+func convertImageToBase64(image: UIImage) -> String {
+    let imageData = image.pngData()!
+    return imageData.base64EncodedString(options: Data.Base64EncodingOptions.lineLength64Characters)
+}
+
 
 extension String {
     func isValidEmail() -> Bool {
@@ -2217,3 +3419,4 @@ extension String {
         return regex.firstMatch(in: self, options: [], range: NSRange(location: 0, length: count)) != nil
     }
 }
+

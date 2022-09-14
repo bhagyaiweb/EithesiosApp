@@ -32,12 +32,19 @@ class CommunityRepresentativeElectedOffical: UIViewController, UITableViewDataSo
     @IBOutlet weak var stateLbl: UILabel!
     @IBOutlet weak var stateUnderLine: UILabel!
     
+    @IBOutlet weak var nodataLbl: UILabel!
+    
+    var zipcodeStr : String?
     override func viewDidLoad()
     {
        super.viewDidLoad()
          reginib()
         self.CommunityRepresentElectedOfficalTable.separatorStyle = .none
         self.setData()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        self.nodataLbl.isHidden = true
     }
     
     func setData(){
@@ -152,14 +159,14 @@ class CommunityRepresentativeElectedOffical: UIViewController, UITableViewDataSo
    
     @IBAction func onPressedClosedBtn(_ sender: Any)
     {
-        
-        self.navigationController?.popViewController(animated: true)
+        self.dismiss(animated: true,completion: nil)
+      //  self.navigationController?.popViewController(animated: true)
     }
     
     
     func callbtnTapped(cell: CommuntyReprsentativeTablecell) {
         let indexPath = self.CommunityRepresentElectedOfficalTable.indexPath(for: cell)
-        let number = self.collection?[indexPath!.row]["name"].stringValue
+        let number = self.collection?[indexPath!.row]["phone_number"].stringValue
         self.dialNumber(number: number!)
     }
     
@@ -220,6 +227,7 @@ extension CommunityRepresentativeElectedOffical{
                 Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: Defines.noInterNet)
                     return
             }
+        print("ZIPCODEPASS",self.zipcodeStr)
             
             let parameter:[String:String] = [
                 "zipcode": "90001",
@@ -238,7 +246,8 @@ extension CommunityRepresentativeElectedOffical{
     //                            print(json)
                                 NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                                 if json["status"].stringValue == "200" {
-                                    
+                                    self.nodataLbl.isHidden = true
+
                                     if let data = json["data"].array{
                                         print(data)
                                         self.collection = data
@@ -250,9 +259,13 @@ extension CommunityRepresentativeElectedOffical{
                                         self.CommunityRepresentElectedOfficalTable.reloadData()
                                     }
                                 }else {
-                                    Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
-                                        return
-                                    })
+//                                    Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
+//                                        return
+//                                    })
+                                    self.nodataLbl.isHidden = false
+                                    let newmsg = json["msg"].stringValue
+                                    self.nodataLbl.text = newmsg
+                                    
                                 }
                                 
                             }) { (error) in

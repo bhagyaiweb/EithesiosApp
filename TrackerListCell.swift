@@ -13,10 +13,10 @@ class TrackerListCell: UITableViewCell {
     @IBOutlet weak var timeLbl: UILabel!
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
     }
 
   
+    @IBOutlet weak var trackerImgView: UIImageView!
     
     @IBOutlet weak var nameLbl: UILabel!
     

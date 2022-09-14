@@ -29,6 +29,9 @@ class SosStartVC: UIViewController,UITableViewDelegate,UITableViewDataSource,UIC
     @IBOutlet weak var stopBtn: UIButton!
     @IBOutlet weak var timerBtn: UIButton!
     
+    @IBOutlet weak var contactNotifiedView: UIView!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         timerBtn.layer.cornerRadius = 12
@@ -40,7 +43,6 @@ class SosStartVC: UIViewController,UITableViewDelegate,UITableViewDataSource,UIC
         collectoionNotifiedContactsView.layer.cornerRadius = 20
         collectoionNotifiedContactsView.clipsToBounds = true
         self.notifiedContactCollectionview.backgroundColor = UIColor.clear
-        collectoionNotifiedContactsView.isHidden = true
         videoListView.isHidden = true
         videoListView.backgroundColor = UIColor.black
         videoListView.layer.cornerRadius = 20
@@ -49,29 +51,50 @@ class SosStartVC: UIViewController,UITableViewDelegate,UITableViewDataSource,UIC
         complainView.clipsToBounds = true
         sumbitBtn.layer.cornerRadius = 10
         sumbitBtn.clipsToBounds = true
-        complainView.isHidden = true
+        //complainView.isHidden = false
         locationView.isHidden = true
         locationView.layer.cornerRadius = 25
         locationView.clipsToBounds = true
         mapview()
         reginib()
     }
+//    override func viewWillAppear(_ animated: Bool) {
+//
+//        collectoionNotifiedContactsView.isHidden = true
+//        videoCollectionVIew.isHidden = true
+//        notifiedContactCollectionview.isHidden = true
+//
+//    }
+    //let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:))
+   // contactNotifiedView.addGestureRecognizer(tap)
 
-    @IBAction func onPressedSumbitBtn(_ sender: Any)
+    // Then, you should implement the handler, which will be called each time when a tap event occurs:
+
+    @objc func handleTap(_ sender: UITapGestureRecognizer? = nil) {
+        // handling code
+    }
+    
+    @IBAction func complaintBtnAction(_ sender: UIButton) {
+        complainView.isHidden = false
+    }
+    
+    @IBAction func onPressedSumbitBtn(_ sender: UIButton)
     {
         let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "SumbitVideoVC") as? SumbitVideoVC
-            self.navigationController?.pushViewController(vc!, animated: true)
+        self.present(vc!, animated: true, completion: nil)
+        //self.navigationController?.pushViewController(vc!, animated: true)
     }
     
     @IBAction func onpressedTimerBtn(_ sender: Any)
     {
-        complainView.isHidden = false
+        complainView.isHidden = true
     }
     
     @IBAction func onPressedStopBtn(_ sender: Any)
     {
         locationView.isHidden =  true
     }
+    
     
     func reginib()
     {
@@ -84,18 +107,17 @@ class SosStartVC: UIViewController,UITableViewDelegate,UITableViewDataSource,UIC
     @IBAction func onpressAddBtn(_ sender: Any)
     {
         videoListView.isHidden = false
-         collectoionNotifiedContactsView.isHidden = true
     }
     
     @IBAction func onPressedarrowBtn(_ sender: Any)
     {
-        collectoionNotifiedContactsView.isHidden = false
+        collectoionNotifiedContactsView.isHidden = true
     }
     
     // working with collection view
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == notifiedContactCollectionview{
-        return notifiedContactName.count
+    return notifiedContactName.count
         }
         else if collectionView == videoCollectionVIew
         {
@@ -134,14 +156,15 @@ class SosStartVC: UIViewController,UITableViewDelegate,UITableViewDataSource,UIC
           
             if collectionView == notifiedContactCollectionview
             {
-                let layout = collectionViewLayout as! UICollectionViewFlowLayout
-                          layout.minimumLineSpacing = 0
-                          layout.minimumInteritemSpacing = 0
-                          let numberOfItemsPerRow: CGFloat = 4.0; print("")
-
-                          let itemWidthtop = (collectionView.bounds.width - layout.minimumLineSpacing) / numberOfItemsPerRow
-                _ = (collectionView.bounds.width - layout.minimumLineSpacing) / numberOfItemsPerRow
-                   return CGSize(width:itemWidthtop, height: 110)
+//                let layout = collectionViewLayout as! UICollectionViewFlowLayout
+//                          layout.minimumLineSpacing = 0
+//                          layout.minimumInteritemSpacing = 0
+//                          let numberOfItemsPerRow: CGFloat = 4.0
+//                print("***")
+//
+//                          let itemWidthtop = (collectionView.bounds.width - layout.minimumLineSpacing) / numberOfItemsPerRow
+//                _ = (collectionView.bounds.width - layout.minimumLineSpacing) / numberOfItemsPerRow
+//                   return CGSize(width: itemWidthdown, height: 143)
             }
             if collectionView == videoCollectionVIew
             {  let layout = collectionViewLayout as! UICollectionViewFlowLayout
@@ -169,15 +192,13 @@ class SosStartVC: UIViewController,UITableViewDelegate,UITableViewDataSource,UIC
         cell.layer.backgroundColor = UIColor.clear.cgColor
         cell.nameLbl.text = nameArray[indexPath.row]
         cell.commentLbl.text  = commentArray[indexPath.row]
-        
         return cell
            
        }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 55
     }
-    func mapview()
-    {
+    func mapview(){
         let camera = GMSCameraPosition.camera(withLatitude: -33.86, longitude: 151.20, zoom: 6.0)
         sosMapView.camera = camera
 //        sosMapView.delegate = (self as! GMSMapViewDelegate)
@@ -192,8 +213,7 @@ class SosStartVC: UIViewController,UITableViewDelegate,UITableViewDataSource,UIC
         marker.map = mapView
     }
      
-    func locatonmapview()
-        {
+    func locatonmapview(){
             let camera = GMSCameraPosition.camera(withLatitude: -33.86, longitude: 151.20, zoom: 6.0)
             sosMapView.camera = camera
     //        sosMapView.delegate = (self as! GMSMapViewDelegate)

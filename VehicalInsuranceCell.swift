@@ -14,12 +14,10 @@ class VehicalInsuranceCell: UITableViewCell {
  
     @IBOutlet weak var insuranceTextfd: TweeActiveTextField!
     
-    
-    
     override func awakeFromNib()
     {
         super.awakeFromNib()
-        // Initialization code
+       
     }
 
     

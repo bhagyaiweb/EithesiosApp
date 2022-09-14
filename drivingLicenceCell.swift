@@ -20,9 +20,9 @@ class drivingLicenceCell: UITableViewCell {
     
     weak var delegate: drivingLicenceCellDelegate?
     
-    
     override func awakeFromNib() {
         super.awakeFromNib()
+        self.deleteBttn.setTitle("", for: .normal)
         // Initialization code
     }
 

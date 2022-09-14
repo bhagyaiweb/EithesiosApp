@@ -10,8 +10,7 @@ import Foundation
 
 struct TwitterConstants {
     
-    static let CONSUMER_KEY = "ivMXmxYcP2hlgqq5FtxdSecx5"
-    static let CONSUMER_SECRET_KEY = "vObNG7dc9vAJkhEeWu3cyDA5Kgk4LbP7w7x0UGNkWABKM3RFBj"
-    static let CALLBACK_URL = "eithes://"
-    
+    static let CONSUMER_KEY = "AXT6vMg02oPZdtNqhzYtmLD44"
+    static let CONSUMER_SECRET_KEY = "4LNgOY1jDUZqgvZS4HAtHQu8uiEhfyQyknsKdy5LwWWUrolxEr"
+    static let CALLBACK_URL = "EithesApp://"
 }

@@ -18,8 +18,8 @@ class SosStartCell: UITableViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
+    
         
-         
     }
 
     

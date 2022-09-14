@@ -4,7 +4,7 @@
 //
 //  Created by iws044 on 04/12/20.
 //  Copyright © 2020 Iws. All rights reserved.
-//
+
 
 import UIKit
 import Alamofire
@@ -13,13 +13,33 @@ import Kingfisher
 import NVActivityIndicatorView
 
 
-class PoliceDepartmentVC: UIViewController {
+protocol dataSelectedDelegate1{
+    func userSelectedValue1(info : String)
+}
 
+class PoliceDepartmentVC: UIViewController,checking1delegate {
+    
+    func userSelectedValue(info: String) {
+        self.userZipcodeStr =  info
+        print("XIPCODEyy",info)
+    }
+    
+    func navigateToDashboard(isclicked: String) {
+        self.userZipcodeStr = isclicked
+        print("newcode",isclicked)
+
+    }
+    
     var PDJson = Dictionary<String, JSON>()
     var BGImgArr = ["1stbackgroundImgaccount", "rectangle-2", "1stbackgroundImgaccount", "rectangle-2"]
     var PDJsonKeys = Array<String>()
+    var userZipcodeStr : String?
+    
+    @IBOutlet weak var nodataLbl: UILabel!
     
     @IBOutlet weak var PDTable: UITableView!
+    var delegate : dataSelectedDelegate1? = nil
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.PDTable.delegate = self
@@ -27,33 +47,45 @@ class PoliceDepartmentVC: UIViewController {
         
     }
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
+        super.viewWillAppear(animated)
+        self.nodataLbl.isHidden = true
+        print("PINCODE",self.userZipcodeStr ?? "nil")
         self.getPDList()
     }
+
     
-    func getPDList(){
+    func getPDList() {
             if  !Reachability.isConnectedToNetwork() {
                 Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: Defines.noInterNet)
                     return
             }
             let parameter:[String:String] = [
-                "zipcode":UserData.ZipCode
+                "zipcode": self.userZipcodeStr ?? ""
             ]
-            print("\nThe parameters for Dashboard : \(parameter)\n")
+            print("\nThe parameters for policedepartmentDashboard : \(parameter)\n")
             let activityData = ActivityData()
             NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
-            
             DataProvider.sharedInstance.getDataFromRegister(path: Defines.ServerUrl + Defines.getPDList, dataDict: parameter, { (json) in
-    //                            print(json)
                                 NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
                                 if json["status"].stringValue == "200" {
+                                    self.nodataLbl.isHidden = true
+
                                     if let data = json["data"].dictionary{
                                         self.PDJson = data
+                                        print("DATA",data)
                                         self.PDJsonKeys = Array(self.PDJson.keys)
-                                        self.PDTable.reloadData()
+                                        self.PDTable.isHidden = false
                                     }
+                                    self.PDTable.reloadData()
                                 }else {
-                                    self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .top)
+                                   // self.view.makeToast(json["msg"].stringValue, duration: 3.0, position: .top)
+                                   // Utility.showMessageDialog(onController: self, withTitle: Defines.alterTitle, withMessage: json["msg"].stringValue, withError: nil, onClose: {
+                                       // return
+                                   // })
+                                    let msg = json["msg"].stringValue
+                                    self.nodataLbl.isHidden = false
+                                    self.PDTable.isHidden = true
+                                    self.nodataLbl.text = msg
                                 }
                             }) { (error) in
                                 print(error)
@@ -62,15 +94,40 @@ class PoliceDepartmentVC: UIViewController {
         }
     
     @IBAction func backButtonTapped(_ sender: Any) {
-        self.navigationController?.popViewController(animated: true)
+        
+//        if (delegate != nil) {
+//            print("SECONDZIPCODEhhh",self.userZipcodeStr!)
+//            delegate?.dataselected(info: self.userZipcodeStr ?? "")
+//            print("SECONDZIPCODElast", self.userZipcodeStr)
+//
+//        }
+        
+       // if (delegate != nil) {
+//            var information : String = self.userZipcodeStr ?? ""
+//            print("SECONDZIPCODE",information)
+//            print("SECONDZIPCODE",self.userZipcodeStr)
+//            delegate?.userSelectedValue1(info: information)
+//            print("SECONDZIPCODElast",information)
+      //  }
+        
+       // if (delegate != nil) {
+        
+            let information : String = self.userZipcodeStr ?? ""
+            print("GENARATION",information)
+            print("SECONDZIPCODE",self.userZipcodeStr)
+        delegate?.userSelectedValue1(info: information)
+            print("RGHJKKK",information)
+      //  }
+        self.dismiss(animated: true, completion: nil)
     }
+    
     
     @IBAction func searchButtontapped(_ sender: Any) {
-        let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "SerachingVC") as? SerachingVC
-        self.navigationController?.pushViewController(vc!, animated: true)
+        let newvc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "SerachingVC") as? SerachingVC
+      //  newvc?.isSerach = "PolicDepart"
+        newvc?.delegate2 = self
+        self.present(newvc!, animated: true, completion: nil)
     }
-    
-
 }
 
 extension PoliceDepartmentVC: UITableViewDelegate, UITableViewDataSource{
@@ -87,13 +144,20 @@ extension PoliceDepartmentVC: UITableViewDelegate, UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let data = Array(self.PDJson.keys)
+        _ = Array(self.PDJson.keys)
         let cell = tableView.dequeueReusableCell(withIdentifier: "PoliceDepartmentTableCell", for: indexPath) as! PoliceDepartmentTableCell
         cell.bgImgView.image = UIImage(named: self.BGImgArr[indexPath.row])
         cell.titleLbl.text = PDJsonKeys[indexPath.row]
         cell.PDCollectionView.tag = 100+indexPath.row
         cell.PDCollectionView.delegate = self
         cell.PDCollectionView.dataSource = self
+        
+        if PDJsonKeys.count < 4 {
+            self.PDTable.isScrollEnabled = true
+        }else{
+            self.PDTable.isScrollEnabled = false
+        }
+        
         return cell
     }
 }
@@ -121,9 +185,9 @@ extension PoliceDepartmentVC: UICollectionViewDelegate,UICollectionViewDataSourc
         }
     }
     
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        
+                
         if collectionView.tag == 100{
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PDCollectionCell", for: indexPath) as! PDCollectionCell
             print(self.PDJson[self.PDJsonKeys[0]]![0]["name"].stringValue)
@@ -189,7 +253,6 @@ extension PoliceDepartmentVC: UICollectionViewDelegate,UICollectionViewDataSourc
                UIApplication.shared.openURL(url)
            }
        } else {
-                // add error message here
        }
     }
 }

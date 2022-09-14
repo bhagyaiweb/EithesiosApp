@@ -23,7 +23,7 @@ class Utility: NSObject {
     class func showMessageDialog( onController controller: UIViewController, withTitle title: String?,  withMessage message: String?, withError error: NSError? = nil, onClose closeAction: (() -> Void)? = nil) {
         var mesg: String?
         if let err = error {
-            mesg = "\(message)\n\n\(err.localizedDescription)"
+            mesg = "\(String(describing: message))\n\n\(err.localizedDescription)"
             NSLog("Error: %@ (error=%@)", message!, (error ?? ""))
         } else {
             mesg = message

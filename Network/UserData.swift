@@ -13,6 +13,7 @@ class UserData: NSObject {
     static var userToken:String = ""
     static var token:String = ""
     static var name:String = ""
+    static var imgstr:String = ""
     static var lastName: String = ""
     static var _id:String = ""
     static var userName:String = ""

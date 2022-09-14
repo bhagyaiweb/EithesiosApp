@@ -2,10 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSCameraUsageDescription</key>
-	<string>The purpose for accessing the camera, such as for a call or interactive live streaming.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>The purpose for accessing the microphone, such as for a call or interactive live streaming.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -23,11 +19,9 @@
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>fb2226932577554782</string>
+				<string>fb559295048750112</string>
 			</array>
 		</dict>
 		<dict>
@@ -35,7 +29,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>li863tq1ghukix29</string>
+				<string>EithesApp</string>
 			</array>
 		</dict>
 		<dict>
@@ -43,41 +37,39 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>eithes</string>
+				<string>com.googleusercontent.apps.749111502302-075ehl5j27v1fhf179fq2ej2ktrj7cf1</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>FacebookAppID</key>
-	<string>2226932577554782</string>
+	<string>559295048750112</string>
+	<key>FacebookClientToken</key>
+	<string>3492895e725dd35d3a6097acd8a49721</string>
 	<key>FacebookDisplayName</key>
-	<string>EthisApp</string>
+	<string>Eithes</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>
-		<string>fbapi20130214</string>
-		<string>fbapi20130410</string>
-		<string>fbapi20130702</string>
-		<string>fbapi20131010</string>
-		<string>fbapi20131219</string>
-		<string>fbapi20140410</string>
-		<string>fbapi20140116</string>
-		<string>fbapi20150313</string>
-		<string>fbapi20150629</string>
-		<string>fbapi20160328</string>
-		<string>fbauth</string>
 		<string>fb-messenger-share-api</string>
-		<string>fbauth2</string>
-		<string>fbshareextension</string>
-		<string>linkedin</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>The purpose for accessing the camera, such as for a call or interactive live streaming.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This application requires location services to work</string>
+	<string>This application requires location services to show current location on map</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This application requires location services to work</string>
+	<string>This application requires location services to show current location on map</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>The purpose for accessing the microphone, such as for a call or interactive live streaming.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photos used</string>
+	<key>FirebaseAutomaticScreenReportingEnabled</key>
+	<string>Yes</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -97,13 +89,14 @@
 			</array>
 		</dict>
 	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>This application requires location services to show current location on map</string>
-
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>This application requires location services to show current location on map</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>

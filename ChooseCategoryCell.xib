@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="ChooseCategoryCell" rowHeight="58" id="KGk-i7-Jjw" customClass="ChooseCategoryCell" customModule="Eithes" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="58"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="ChooseCategoryCell" rowHeight="46" id="KGk-i7-Jjw" customClass="ChooseCategoryCell" customModule="Eithes" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="46"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="58"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="46"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lw3-pL-fHt">
-                        <rect key="frame" x="0.0" y="5" width="320" height="41"/>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Traffic Stop" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lw3-pL-fHt">
+                        <rect key="frame" x="0.0" y="8" width="320" height="33"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="41" id="4pn-1X-sYg"/>
+                            <constraint firstAttribute="height" constant="33" id="4pn-1X-sYg"/>
                         </constraints>
                         <fontDescription key="fontDescription" type="system" pointSize="16"/>
                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -30,16 +30,16 @@
                 </subviews>
                 <constraints>
                     <constraint firstItem="lw3-pL-fHt" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="4ei-2j-WGt"/>
-                    <constraint firstAttribute="bottom" secondItem="lw3-pL-fHt" secondAttribute="bottom" constant="5" id="ONb-ae-ht3"/>
+                    <constraint firstAttribute="bottom" secondItem="lw3-pL-fHt" secondAttribute="bottom" constant="8" id="ONb-ae-ht3"/>
                     <constraint firstAttribute="trailing" secondItem="lw3-pL-fHt" secondAttribute="trailing" id="Q6h-7k-W1A"/>
-                    <constraint firstItem="lw3-pL-fHt" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="Rvb-um-5LD"/>
+                    <constraint firstItem="lw3-pL-fHt" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="8" id="Rvb-um-5LD"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="lbl" destination="lw3-pL-fHt" id="C1R-sO-eNP"/>
             </connections>
-            <point key="canvasLocation" x="-59.420289855072468" y="73.660714285714278"/>
+            <point key="canvasLocation" x="-59.420289855072468" y="74.330357142857139"/>
         </tableViewCell>
     </objects>
 </document>

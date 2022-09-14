@@ -1,19 +1,15 @@
-//
+
 //  SosChooseCategory.swift
 //  Eithes
-//
 //  Created by Shubham Tomar on 07/04/20.
 //  Copyright © 2020 Iws. All rights reserved.
-//
 
 import UIKit
 
 class SosChooseCategory: UIViewController,UITableViewDelegate,UITableViewDataSource,MyCellDelegate4{
     
-    
    var buttonNameArray = ["Traffic Stop","Public Assault","Private Assault","Injury Blood Loss","Car Accident","Police Brutality","Medical Alert","Abduction","Harassment"]
     
-
     @IBOutlet weak var sosBtnTableView: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,10 +17,10 @@ class SosChooseCategory: UIViewController,UITableViewDelegate,UITableViewDataSou
         reginib()
     }
     
-    
     @IBAction func onPressedCloseBtn(_ sender: Any)
     {
-        self.navigationController?.popViewController(animated: true)
+       // self.navigationController?.popViewController(animated: true)
+        self.dismiss(animated: true,completion: nil)
     }
     
     
@@ -42,9 +38,8 @@ class SosChooseCategory: UIViewController,UITableViewDelegate,UITableViewDataSou
         let cell =  tableView.dequeueReusableCell(withIdentifier:"ButtonTableCell", for: indexPath) as! ButtonTableCell
            cell.delegate = self
         let title = buttonNameArray[indexPath.row]
-        print(title)
+        print("OTHERCATEGORY",title)
         cell.sosCategoryButton.setTitle(title, for: .normal)
-      
         return cell
       }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -55,6 +50,7 @@ class SosChooseCategory: UIViewController,UITableViewDelegate,UITableViewDataSou
     {
         
     }
+    
 }
 
     

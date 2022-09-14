@@ -41,12 +41,18 @@ class Defines: NSObject
     //"http://178.62.83.145:3002/api/"
     //"http://67.205.173.26:3000/api/"
     static let register = "signup"
+    static let fileAComplaint = "file_complain"
+
     static let signIn = "user_login"
     static let dashboard_Data = "dashboard_data"
+    static let zipcodesList_Data = "zipcode_list"
     static let update_profile = "update_profile"
     static let view_profile = "view_profile"
-    static let getFireDepartmentList = "get_police_department_employee"
-    static let getPoliceDepartmentList = "get_fire_department_list"
+    static let getFireDepartmentList = "get_fire_department_list"
+    static let getDepartmentsList = "department_list"
+    static let getPoliceDepartmentList = "get_police_department_employee"
+    static let getShopliftingList = "feeds"
+
     static let getVehicleList = "vehicle_list"
     static let UploadVehicleRegistration = "vehicle_registration"
     static let deleteVehicle = "delete_vehicle"
@@ -56,10 +62,17 @@ class Defines: NSObject
     static let GetAttorneyList = "attorney_list"
     static let GetBailBondList = "bail_bond_lists"
     static let getVideoList = "get_self_video"
+    static let getparallelStreamList = "get_parallel_streamer"
+
+    static let ContactSupportList = "contact_us"
+
     static let selfHelpVideo = "upload_self_video"
+    static let editselfHelpVideo = "upload_self_video"
     static let getDrivingLicenceList = "license_list"
     static let deleteDrivingList = "delete_license"
     static let uploadDL = "upload_driver_license"
+    static let uploadVideoImg = "self_thumbnail_image"
+
     static let uploadConnection = "save_my_connections"
     static let getmyConnectionList = "my_connections"
     static let deleteConnection = "delete_connection"
@@ -87,6 +100,8 @@ class Defines: NSObject
     static let getFriendsPost = "posts/getFriendPost/"
     static let socialSignup = "users/signupSocial"
     static let socialCheck = "users/socialIdcheck"
+    static let socialLogin = "social_login"
+
     
     static let like = "posts/likePost"
     static let getProfile = "users/userProfile/"
@@ -145,4 +160,17 @@ class Defines: NSObject
         
     static let placeholder = UIImage(named: "default")
 
+    //MARK: sos apis
+   // start_sos
+   // static let categoryList = "cetegory_list"
+    static let categoryList = "cetegory_list"
+    static let searchingList = "sos_by_category"
+
+
+    static let startSos = "start_sos"
+    static let startAgora = "start_agora"
+    static let stopAgora = "stop_agora"
+    static let startAquireAgora = "aquire_calling"
+
+    
 }

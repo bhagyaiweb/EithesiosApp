@@ -32,7 +32,7 @@ class ButtonTableCell: UITableViewCell {
          if sosCategoryButton.backgroundColor ==  UIColor.gray
                 {
                     self.sosCategoryButton.backgroundColor = UIColor.blue
-        //           
+                   
                 }
                 else
                 {

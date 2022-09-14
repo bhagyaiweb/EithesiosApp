@@ -11,10 +11,12 @@ import UIKit
 class NotifiedContactCell: UICollectionViewCell {
 
     @IBOutlet weak var nameLbl: UILabel!
+    
+    @IBOutlet weak var profileImgView: UIImageView!
+    
     override func awakeFromNib()
     {
         super.awakeFromNib()
-        
     }
 
 }

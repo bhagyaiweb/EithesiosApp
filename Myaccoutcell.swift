@@ -18,9 +18,6 @@ class Myaccoutcell: UITableViewCell {
     
     override func awakeFromNib()
     {
-        
-         
-    
         super.awakeFromNib()
          
     }

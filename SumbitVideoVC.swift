@@ -8,28 +8,26 @@
 
 import UIKit
 
-class SumbitVideoVC: UIViewController
-{
+class SumbitVideoVC: UIViewController {
 
     @IBOutlet weak var saveBtn: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
         saveBtn.layer.cornerRadius = 10
         saveBtn.clipsToBounds = true
-    
-    }
-
-    @IBAction func onPressedCloseBtn(_ sender: Any)
-    {
-        self.navigationController?.popViewController(animated: true)
     }
     
-    
+    @IBAction func onPressedCloseBtn(_ sender: Any){
+        
+        self.dismiss(animated: true)
+        
+     //   self.navigationController?.popViewController(animated: true)
+        
+    }
     
     @IBAction func onPressedSaveBtn(_ sender: Any)
     {
         
-      
     }
     
 

@@ -18,8 +18,6 @@ class VehicalRegistrationCell: UITableViewCell {
     {
         super.awakeFromNib()
        
-        
-    
     }
 
   

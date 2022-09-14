@@ -20,6 +20,8 @@ protocol CommuntyReprsentativeTablecellDelegate: AnyObject
 
 
 class CommuntyReprsentativeTablecell: UITableViewCell {
+    @IBOutlet weak var nodataLbl: UILabel!
+    
     
     @IBOutlet weak var policeNameLbl: UILabel!
     @IBOutlet weak var phoneNumberLbl: UILabel!

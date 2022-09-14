@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -16,28 +17,28 @@
                 <rect key="frame" x="0.0" y="0.0" width="279" height="68"/>
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="fill" contentVerticalAlignment="fill" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="z7x-Fv-OKB">
+                    <button opaque="NO" multipleTouchEnabled="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" pointerInteraction="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LfW-Cv-dCJ">
                         <rect key="frame" x="0.0" y="0.0" width="279" height="68"/>
-                        <fontDescription key="fontDescription" type="system" weight="medium" pointSize="10"/>
-                        <state key="normal">
-                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        </state>
+                        <fontDescription key="fontDescription" type="system" pointSize="9"/>
+                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <state key="normal" title="Button"/>
                         <connections>
-                            <action selector="onpressedShopliftingBtnWithSender:" destination="gTV-IL-0wX" eventType="touchUpInside" id="lro-Cr-QvC"/>
+                            <action selector="onpressedShopliftingBtnWithSender:" destination="gTV-IL-0wX" eventType="touchUpInside" id="EV8-Vf-KZe"/>
                         </connections>
                     </button>
                 </subviews>
             </view>
-            <constraints>
-                <constraint firstItem="z7x-Fv-OKB" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="HhK-YA-b0s"/>
-                <constraint firstItem="z7x-Fv-OKB" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="UuW-fA-ymn"/>
-                <constraint firstAttribute="trailing" secondItem="z7x-Fv-OKB" secondAttribute="trailing" id="VX9-tm-NLE"/>
-                <constraint firstAttribute="bottom" secondItem="z7x-Fv-OKB" secondAttribute="bottom" id="ZOR-gf-hez"/>
-            </constraints>
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="LfW-Cv-dCJ" secondAttribute="bottom" id="9z9-S8-FGu"/>
+                <constraint firstItem="LfW-Cv-dCJ" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="SaZ-oY-X8D"/>
+                <constraint firstAttribute="trailing" secondItem="LfW-Cv-dCJ" secondAttribute="trailing" id="cyK-ea-dgf"/>
+                <constraint firstItem="LfW-Cv-dCJ" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="x1o-Ev-4yj"/>
+            </constraints>
             <size key="customSize" width="279" height="68"/>
             <connections>
-                <outlet property="shopLiftingBtn" destination="z7x-Fv-OKB" id="XDl-PD-hlV"/>
+                <outlet property="shopLiftingBtn" destination="LfW-Cv-dCJ" id="P1v-8d-Kcz"/>
             </connections>
             <point key="canvasLocation" x="85" y="58"/>
         </collectionViewCell>

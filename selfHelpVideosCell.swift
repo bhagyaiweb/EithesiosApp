@@ -10,5 +10,34 @@ import UIKit
 
 class selfHelpVideosCell: UICollectionViewCell {
     @IBOutlet weak var videoThumbnail: UIImageView!
+    @IBOutlet weak var editImg: UIImageView!
+    
+    @IBOutlet weak var editBtn: UIButton!
     @IBOutlet weak var videotitleLbl: UILabel!
+    
+var editBtn1 : (() -> Void)? = nil
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+    }
+    
+    @IBAction func editBtnActn(_ sender: Any) {
+        if let newBtnaction = self.editBtn1 {
+            
+            newBtnaction()
+            
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

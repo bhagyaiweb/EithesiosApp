@@ -17,6 +17,7 @@ class FeedsCollectionVC: UICollectionViewCell {
     @IBOutlet weak var bgNameLbl: UILabel!
     @IBOutlet weak var bgPhoneLbl: UILabel!
     
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         self.bgView.isHidden = true

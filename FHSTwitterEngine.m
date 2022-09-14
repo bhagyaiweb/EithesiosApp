@@ -2313,11 +2313,11 @@ id removeNull(id rootObject) {
                 });
             } else {
                 self.requestToken = [FHSToken tokenWithHTTPResponseBody:reqString];
-                NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.twitter.com/oauth/authorize?oauth_token=%@",_requestToken.key]]];
+                NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.twitter.com/oauth/authorize?oauth_token=%@",self->_requestToken.key]]];
                 
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
-                        [_theWebView loadRequest:request];
+                        [self->_theWebView loadRequest:request];
                     }
                 });
             }

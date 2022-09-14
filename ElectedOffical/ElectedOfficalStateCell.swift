@@ -33,8 +33,6 @@ class ElectedOfficalStateCell: UITableViewCell {
     @IBAction func onPressedForwardArrowBtn( sender: AnyObject)
     {
           delegate?.onPressedForwardArrowBtn(cell: self)
-        
-        
     }
     
     

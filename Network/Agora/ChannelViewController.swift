@@ -12,7 +12,7 @@ import AgoraRtcKit
 class ChannelViewController: UIViewController {
 
     static let channelName: String = "sumitTest"
-    static let appId: String = "5d5dd39d0ce547a5a9a3278663b8457a"
+    static let appId: String = "a6e3170384984816bf987ddd4aad3029"
 
     /// Static token here, but can be dynamic if calling `joinChannelWithFetch` instead of `joinChannel`
     /// `joinChannelWithFetch` is found in AgoraToken.swift
@@ -22,7 +22,7 @@ class ChannelViewController: UIViewController {
     static var tokenBaseURL: String? = ""
 
     /// Setting to zero will tell Agora to assign one for you
-    lazy var userID: UInt = 0
+    lazy var userID: UInt = 174
 
     var userRole: AgoraClientRole = .audience
 
@@ -82,6 +82,8 @@ class ChannelViewController: UIViewController {
         }
     }
 
+    
+    
     required init() {
         super.init(nibName: nil, bundle: nil)
         self.modalPresentationStyle = .fullScreen
@@ -91,3 +93,23 @@ class ChannelViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
