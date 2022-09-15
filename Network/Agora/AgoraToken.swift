@@ -91,3 +91,4 @@ class AgoraToken {
         task.resume()
     }
 }
+
